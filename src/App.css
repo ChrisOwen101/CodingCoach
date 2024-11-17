@@ -1,0 +1,15 @@
+.code_highlighted {
+    background-color: #fafafa !important;
+    display: block !important;
+    width: 110% !important;
+}
+
+.code_greyed {
+    color: #c9c9c9 !important;
+    display: block !important;
+    width: 100% !important;
+}
+
+.code_greyed .token {
+    color: #c9c9c9 !important;
+}
