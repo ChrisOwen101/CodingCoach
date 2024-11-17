@@ -8,4 +8,5 @@ export interface FeedbackPointModel {
 
 export interface FeedbackModel {
     feedback_points: FeedbackPointModel[];
+    language: string;
 }

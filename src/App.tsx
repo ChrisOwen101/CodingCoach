@@ -16,6 +16,8 @@ function App() {
   const [feedback, setFeedback] = useState<FeedbackModel | undefined>(undefined);
   const [hoveredPoint, setHoveredPoint] = useState<FeedbackPointModel | undefined>(undefined);
 
+  console.log(feedback)
+
   useEffect(() => {
     if (!code) {
       return;
@@ -60,8 +62,8 @@ function App() {
         <h2>Code</h2>
         <CodeEditor
           value={code}
-          language="python"
-          placeholder="Please enter python code."
+          language={feedback?.language || "text"}
+          placeholder="Enter your code here"
           onChange={(evn) => setCode(evn.target.value)}
           padding={15}
           rehypePlugins={[
@@ -96,7 +98,7 @@ function App() {
       <div style={{ flex: 1, padding: '10px' }}>
         <h2>Feedback</h2>
         {loading && <p>Loading...</p>}
-        {feedback && <Feedback feedback_points={feedback.feedback_points} onLeave={() => {
+        {feedback && <Feedback language={feedback.language} feedback_points={feedback.feedback_points} onLeave={() => {
           setHoveredPoint(undefined);
         }} onHover={(hovered_point) => {
           setHoveredPoint(hovered_point);

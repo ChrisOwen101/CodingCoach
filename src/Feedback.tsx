@@ -8,6 +8,7 @@ interface FeedbackProps {
     feedback_points: FeedbackPointModel[];
     onHover?: (point: FeedbackPointModel) => void;
     onLeave?: () => void;
+    language: string;
 }
 
 const formatLineString = (line_numbers: string): string => {
@@ -18,7 +19,7 @@ const formatLineString = (line_numbers: string): string => {
     }
 }
 
-const Feedback: React.FC<FeedbackProps> = ({ feedback_points, onHover, onLeave }) => {
+const Feedback: React.FC<FeedbackProps> = ({ feedback_points, onHover, onLeave, language }) => {
     return (
         <div onMouseLeave={onLeave}>
             {feedback_points.map((point, index) => (
@@ -30,7 +31,7 @@ const Feedback: React.FC<FeedbackProps> = ({ feedback_points, onHover, onLeave }
                     <h3>{point.title} <i>({formatLineString(point.line_numbers)})</i></h3>
                     <p>{point.description}</p>
                     <p>{point.questions}</p>
-                    <SyntaxHighlighter language="python" style={docco}>
+                    <SyntaxHighlighter language={language} style={docco}>
                         {point.code_example}
                     </SyntaxHighlighter>
                 </div>

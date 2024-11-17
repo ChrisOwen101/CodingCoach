@@ -19,12 +19,18 @@ const getSystemMessageForCoach = (): ChatMessage => ({
     You will be given code in the first message. You should reply with a message providing feedback on the code. You can also ask clarifying questions or provide additional information to help the user improve their code.`
 });
 
+"Invalid schema for response_format 'feedback_list': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Missing 'language'."
+
 const getSchema = () => (
     {
         "name": "feedback_list",
         "schema": {
             "type": "object",
             "properties": {
+                "language": {
+                    "type": "string",
+                    "description": "The programming language of the code given in prism format."
+                },
                 "feedback_points": {
                     "type": "array",
                     "description": "A collection of feedback points.",
@@ -57,14 +63,15 @@ const getSchema = () => (
                             "description",
                             "code_example",
                             "questions",
-                            "line_numbers"
+                            "line_numbers",
                         ],
                         "additionalProperties": false
                     }
                 }
             },
             "required": [
-                "feedback_points"
+                "feedback_points",
+                "language"
             ],
             "additionalProperties": false
         },
