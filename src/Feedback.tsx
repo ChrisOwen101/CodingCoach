@@ -31,7 +31,7 @@ const Feedback: React.FC<FeedbackProps> = ({ feedback_points, onHover, onLeave, 
                     <h3>{point.title} <i>({formatLineString(point.line_numbers)})</i></h3>
                     <p>{point.description}</p>
                     <p>{point.questions}</p>
-                    <SyntaxHighlighter language={language} style={docco}>
+                    <SyntaxHighlighter language={language} style={docco} wrapLongLines={true}>
                         {point.code_example}
                     </SyntaxHighlighter>
                 </div>
