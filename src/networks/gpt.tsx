@@ -85,8 +85,6 @@ export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
         },
     ];
 
-    console.log(addLineNumbers(code))
-
     try {
         const response = await axios.post(
             API_URL,
@@ -101,7 +99,7 @@ export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
             {
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${import.meta.env.API_KEY}`,
+                    'Authorization': `Bearer ${import.meta.env.VITE_API_KEY}`,
                 },
             }
         );
