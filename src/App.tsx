@@ -1,5 +1,5 @@
 import './App.css'
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useEffect } from 'react';
 import { getCodeFeedback } from './networks/gpt';
 import Feedback from './Feedback';
@@ -69,7 +69,7 @@ function App() {
             [
               rehypeRewrite,
               {
-                rewrite: (node, index, parent) => {
+                rewrite: (node: any, index: number) => {
                   if (node.properties?.className?.includes("code-line")) {
                     if (hoveredPoint && hoveredPoint.line_numbers) {
                       const linesToHighlight = getLinesToHighlight(hoveredPoint.line_numbers);

@@ -3,9 +3,9 @@ import { FeedbackModel } from '../models/FeedbackModel';
 
 const API_URL = 'https://api.openai.com/v1/chat/completions';
 
-const MODEL_GPT_4O = 'gpt-4o';
+// const MODEL_GPT_4O = 'gpt-4o';
 const MODEL_GPT_4O_MINI = 'gpt-4o-mini';
-const MODEL_GPT_35_TURBO = 'gpt-3.5-turbo';
+// const MODEL_GPT_35_TURBO = 'gpt-3.5-turbo';
 
 interface ChatMessage {
     role: 'system' | 'user' | 'assistant';
