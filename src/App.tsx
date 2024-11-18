@@ -63,7 +63,7 @@ function App() {
         <CodeEditor
           value={code}
           language={feedback?.language || "text"}
-          placeholder="Enter your code here"
+          placeholder="Copy and paste your code here"
           onChange={(evn) => setCode(evn.target.value)}
           padding={15}
           rehypePlugins={[
