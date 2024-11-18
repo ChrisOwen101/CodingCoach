@@ -59,7 +59,7 @@ const getSchema = () => (
                             },
                             "line_numbers": {
                                 "type": "string",
-                                "description": "The line numbers in the code where the feedback applies. Denoted as a range (e.g., '1-5')."
+                                "description": "The line numbers in the code where the feedback applies. Denoted as a comma separated list, with individual numbers or ranges of numbers (e.g. 3,4,10-15)"
                             },
                             "code_example": {
                                 "type": "string",
