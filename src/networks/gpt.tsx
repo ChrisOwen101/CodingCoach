@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { FeedbackModel } from '../models/FeedbackModel';
+import { FeedbackModel, FeedbackPointModel } from '../models/FeedbackModel';
 
 const API_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -119,7 +119,19 @@ export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
             }
         );
 
-        return JSON.parse(response.data.choices[0].message.content) as FeedbackModel;
+        const feedbackData = JSON.parse(response.data.choices[0].message.content);
+        const feedbackPoints = feedbackData.feedback_points.map((point: any) => new FeedbackPointModel(
+            point.title,
+            point.description,
+            point.questions,
+            point.line_numbers,
+            point.code_example
+        ));
+
+        return {
+            feedback_points: feedbackPoints,
+            language: feedbackData.language,
+        } as FeedbackModel;
     } catch (error) {
         console.error('Error starting conversation:', error);
         throw error;

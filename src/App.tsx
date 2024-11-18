@@ -7,6 +7,8 @@ import { FeedbackModel, FeedbackPointModel } from './models/FeedbackModel';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import rehypePrism from 'rehype-prism-plus';
 import rehypeRewrite from "rehype-rewrite";
+import { useRef } from 'react';
+
 
 
 function App() {
@@ -54,9 +56,20 @@ function App() {
     return lines;
   };
 
+  const codeEditorRef = useRef<HTMLDivElement>(null);
+
+  const scrollToDepth = (depth: number) => {
+    if (codeEditorRef.current) {
+      codeEditorRef.current.scrollTo({
+        top: depth,
+        behavior: 'smooth',
+      });
+    }
+  };
+
   return (
-    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      <div ref={codeEditorRef} style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
         <h2>Code</h2>
         <CodeEditor
           value={code}
@@ -99,12 +112,14 @@ function App() {
         {feedback && feedback.feedback_points.map((point: FeedbackPointModel, _: number) => (
           <FeedbackPoint key={point.title} language={feedback.language} initialCode={code} point={point} onLeave={() => {
             setHoveredPoint(undefined);
-          }} onHover={(hovered_point) => {
-            setHoveredPoint(hovered_point);
+          }} onHover={(hoveredPoint) => {
+            setHoveredPoint(hoveredPoint);
+            console.log(hoveredPoint.getLinesToHighlight()[0] * 10)
+            scrollToDepth(hoveredPoint.getLinesToHighlight()[0] * 10);
           }} />
         ))}
       </div>
-    </div>
+    </div >
   );
 }
 export default App
