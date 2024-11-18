@@ -2,7 +2,7 @@ import './App.css'
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { getCodeFeedback } from './networks/gpt';
-import Feedback from './Feedback';
+import FeedbackPoint from './Feedback';
 import { FeedbackModel, FeedbackPointModel } from './models/FeedbackModel';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import rehypePrism from 'rehype-prism-plus';
@@ -15,8 +15,6 @@ function App() {
 
   const [feedback, setFeedback] = useState<FeedbackModel | undefined>(undefined);
   const [hoveredPoint, setHoveredPoint] = useState<FeedbackPointModel | undefined>(undefined);
-
-  console.log(feedback)
 
   useEffect(() => {
     if (!code) {
@@ -57,8 +55,8 @@ function App() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <div style={{ flex: 1, padding: '10px' }}>
+    <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+      <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
         <h2>Code</h2>
         <CodeEditor
           value={code}
@@ -75,7 +73,7 @@ function App() {
                   if (node.properties?.className?.includes("code-line")) {
                     if (hoveredPoint && hoveredPoint.line_numbers) {
                       const linesToHighlight = getLinesToHighlight(hoveredPoint.line_numbers);
-                      console.log(linesToHighlight);
+
                       if (linesToHighlight.includes(index + 1)) {
                         node.properties.className.push("code_highlighted");
                       } else {
@@ -95,14 +93,16 @@ function App() {
           }}
         />
       </div>
-      <div style={{ flex: 1, padding: '10px' }}>
+      <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
         <h2>Feedback</h2>
         {loading && <p>Loading...</p>}
-        {feedback && <Feedback language={feedback.language} feedback_points={feedback.feedback_points} onLeave={() => {
-          setHoveredPoint(undefined);
-        }} onHover={(hovered_point) => {
-          setHoveredPoint(hovered_point);
-        }} />}
+        {feedback && feedback.feedback_points.map((point: FeedbackPointModel, _: number) => (
+          <FeedbackPoint key={point.title} language={feedback.language} initialCode={code} point={point} onLeave={() => {
+            setHoveredPoint(undefined);
+          }} onHover={(hovered_point) => {
+            setHoveredPoint(hovered_point);
+          }} />
+        ))}
       </div>
     </div>
   );

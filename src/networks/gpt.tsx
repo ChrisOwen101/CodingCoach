@@ -19,7 +19,15 @@ const getSystemMessageForCoach = (): ChatMessage => ({
     You will be given code in the first message. You should reply with a message providing feedback on the code. You can also ask clarifying questions or provide additional information to help the user improve their code.`
 });
 
-"Invalid schema for response_format 'feedback_list': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Missing 'language'."
+const getConversationalCoach = (): ChatMessage => ({
+    role: 'system',
+    content: `You are a coding coach. Your task is to provide constructive feedback on the code provided by the user. Focus on best practices, potential improvements, and any errors or issues you notice.
+    
+    You will know the codebase, the previous feedback given and then you will be answering questions and queries the trainees has about the feedback.
+    
+    Keep responses fairly short and conversational.`
+});
+
 
 const getSchema = () => (
     {
@@ -114,6 +122,48 @@ export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
         return JSON.parse(response.data.choices[0].message.content) as FeedbackModel;
     } catch (error) {
         console.error('Error starting conversation:', error);
+        throw error;
+    }
+};
+
+export const continueConversation = async (initialCode: string | undefined, feedbackPoint: string, previousMessages: string[], newMessage: string): Promise<string> => {
+    const messages: ChatMessage[] = [
+        {
+            role: 'user',
+            content: addLineNumbers(initialCode ?? ""),
+        },
+        {
+            role: 'assistant',
+            content: feedbackPoint,
+        },
+        ...previousMessages.map(message => ({
+            role: 'user',
+            content: message,
+        })) as ChatMessage[],
+        {
+            role: 'user',
+            content: newMessage,
+        },
+    ];
+
+    try {
+        const response = await axios.post(
+            API_URL,
+            {
+                model: MODEL_GPT_4O_MINI,
+                messages: [getConversationalCoach(), ...messages],
+            },
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${import.meta.env.VITE_API_KEY}`,
+                },
+            }
+        );
+
+        return response.data.choices[0].message.content
+    } catch (error) {
+        console.error('Error continuing conversation:', error);
         throw error;
     }
 };
