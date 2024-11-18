@@ -68,8 +68,8 @@ function App() {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      <div ref={codeEditorRef} style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
+    <div style={{ display: 'flex', height: '100vh', margin: '12px' }}>
+      <div ref={codeEditorRef} style={{ flex: 1, padding: '12px', overflowY: 'auto' }}>
         <h2>Code</h2>
         <CodeEditor
           value={code}
@@ -106,7 +106,7 @@ function App() {
           }}
         />
       </div>
-      <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
+      <div style={{ flex: 1, padding: '12px', overflowY: 'auto' }}>
         <h2>Feedback</h2>
         {loading && <p>Loading...</p>}
         {feedback && feedback.feedback_points.map((point: FeedbackPointModel, _: number) => (
