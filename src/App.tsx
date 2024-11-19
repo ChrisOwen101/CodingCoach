@@ -92,7 +92,7 @@ function App() {
       return <p>No feedback available</p>;
     }
 
-    return feedback.feedbackPoints.map((point: FeedbackPointModel, index: number) => (
+    return feedback.feedbackPoints.map((point: FeedbackPointModel, _: number) => (
       <FeedbackPoint key={point.title} language={feedback.language} initialCode={code} point={point} onLeave={() => {
         setHoveredPoint(undefined);
       }} onHover={(hoveredPoint) => {
