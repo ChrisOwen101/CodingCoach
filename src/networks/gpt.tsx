@@ -3,7 +3,7 @@ import { FeedbackModel, FeedbackPointModel } from '../models/FeedbackModel';
 
 const API_URL = 'https://api.openai.com/v1/chat/completions';
 
-// const MODEL_GPT_4O = 'gpt-4o';
+//const MODEL_GPT_4O = 'gpt-4o';
 const MODEL_GPT_4O_MINI = 'gpt-4o-mini';
 // const MODEL_GPT_35_TURBO = 'gpt-3.5-turbo';
 
@@ -12,16 +12,36 @@ interface ChatMessage {
     content: string;
 }
 
-const getSystemMessageForCoach = (): ChatMessage => ({
-    role: 'system',
-    content: `You are a coding coach. Your task is to provide constructive feedback on the code provided by the user. Focus on best practices, potential improvements, and any errors or issues you notice.
+const getBaseCoach = (area: string): string => (
+    `You are a coding coach who is trained to give feedback only on "${area}". Your task is to provide constructive feedback on the code provided by the user.  You will be given code in the first message. You should reply with a JSON object containing feedback on the code.
     
-    You will be given code in the first message. You should reply with a message providing feedback on the code. You can also ask clarifying questions or provide additional information to help the user improve their code.`
+    All feedback should be in markdown format. All titles used should use H3 as the largest heading.`
+)
+
+const getAdvancedTechniquesCoach = (): ChatMessage => ({
+    role: 'system',
+    content: `${getBaseCoach("advanced techniques and best practices")}
+    
+    You should focus on teaching the user advanced techniques and best practices. Explain how they could improve their code by using techniques, approaches, syntax, patterns and language features that they might not be familiar with.`
+});
+
+const getReadabilityCoach = (): ChatMessage => ({
+    role: 'system',
+    content: `${getBaseCoach("Readability and Code Quality")}
+
+    You should focus on the Readability of the code and general code quality. This might include things like variable names, comments, code structure, and overall readability.`
+});
+
+const getPerformanceCoach = (): ChatMessage => ({
+    role: 'system',
+    content: `${getBaseCoach("Performance")}
+
+    You should focus on the Performance of the code. This might include things like algorithmic complexity, memory usage, and execution speed. Some red flags might be inefficient loops, unnecessary memory allocations, or slow algorithms.`
 });
 
 const getConversationalCoach = (): ChatMessage => ({
     role: 'system',
-    content: `You are a coding coach. Your task is to provide constructive feedback on the code provided by the user. Focus on best practices, potential improvements, and any errors or issues you notice.
+    content: `You are a coding coach. Your task is to provide constructive feedback on the code provided by the user. 
     
     You will know the codebase, the previous feedback given and then you will be answering questions and queries the trainees has about the feedback.
     
@@ -49,6 +69,10 @@ const getSchema = () => (
                                 "type": "string",
                                 "description": "The title of the feedback point."
                             },
+                            "summary": {
+                                "type": "string",
+                                "description": "A very short summary of the problem"
+                            },
                             "description": {
                                 "type": "string",
                                 "description": "A detailed explanation of the feedback given."
@@ -72,6 +96,7 @@ const getSchema = () => (
                             "code_example",
                             "questions",
                             "line_numbers",
+                            "summary"
                         ],
                         "additionalProperties": false
                     }
@@ -92,7 +117,7 @@ const addLineNumbers = (code: string): string => {
     return lines.map((line, index) => `${index + 1}: ${line}`).join('\n');
 }
 
-export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
+export const getCodeFeedback = async (code: string, feedbackType: string): Promise<FeedbackModel> => {
     const messages: ChatMessage[] = [
         {
             role: 'user',
@@ -100,12 +125,20 @@ export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
         },
     ];
 
+    if (feedbackType.toLowerCase() === 'readability') {
+        messages.unshift(getReadabilityCoach());
+    } else if (feedbackType.toLowerCase() === 'advanced') {
+        messages.unshift(getAdvancedTechniquesCoach());
+    } else if (feedbackType.toLowerCase() === 'performance') {
+        messages.unshift(getPerformanceCoach());
+    }
+
     try {
         const response = await axios.post(
             API_URL,
             {
                 model: MODEL_GPT_4O_MINI,
-                messages: [getSystemMessageForCoach(), ...messages],
+                messages: messages,
                 response_format: {
                     type: "json_schema",
                     json_schema: getSchema(),
@@ -125,11 +158,12 @@ export const getCodeFeedback = async (code: string): Promise<FeedbackModel> => {
             point.description,
             point.questions,
             point.line_numbers,
-            point.code_example
-        ));
+            point.code_example,
+            point.summary));
 
         return {
-            feedback_points: feedbackPoints,
+            feedbackType: feedbackType,
+            feedbackPoints: feedbackPoints,
             language: feedbackData.language,
         } as FeedbackModel;
     } catch (error) {
