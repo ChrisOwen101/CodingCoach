@@ -17,7 +17,7 @@ const formatLineCount = (lineNumbers: string): string => {
 }
 
 const FeedbackPoint: React.FC<FeedbackProps> = ({ point, onHover, onLeave, onExpandClicked }) => {
-    const [isHovering, setIsHovering] = React.useState<boolean>(false);
+    const [_, setIsHovering] = React.useState<boolean>(false);
 
     const getHeaderColor = (type: string): React.CSSProperties => {
         switch (type.toLowerCase()) {
