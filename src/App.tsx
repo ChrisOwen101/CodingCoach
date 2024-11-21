@@ -143,10 +143,10 @@ function App() {
       </div>
       <div style={{ flex: 1, padding: '12px', overflowY: 'auto' }}>
         <h1>Feedback</h1>
-        <h2>Performance</h2>
-        {getFeedbackComponent(performanceFeedback)}
         <h2>Readability</h2>
         {getFeedbackComponent(readabilityFeedback)}
+        <h2>Performance</h2>
+        {getFeedbackComponent(performanceFeedback)}
         <h2>Advanced</h2>
         {getFeedbackComponent(advancedFeedback)}
       </div>
