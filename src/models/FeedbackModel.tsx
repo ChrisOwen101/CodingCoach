@@ -5,14 +5,16 @@ export class FeedbackPointModel {
     line_numbers: string;
     code_example: string;
     summary: string;
+    type: string;
 
-    constructor(title: string, description: string, questions: string, line_numbers: string, code_example: string, summary: string) {
+    constructor(title: string, description: string, questions: string, line_numbers: string, code_example: string, summary: string, type: string) {
         this.title = title;
         this.description = description;
         this.questions = questions;
         this.line_numbers = line_numbers;
         this.code_example = code_example;
         this.summary = summary;
+        this.type = type;
     }
 
     getLinesToHighlight(): number[] {

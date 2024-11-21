@@ -1,15 +1,16 @@
 import './App.css'
 import { useState, useEffect, useRef } from 'react';
 import { getCodeFeedback } from './networks/gpt';
-import FeedbackPoint from './Feedback';
+import FeedbackPoint from './FeedbackPoint';
 import { FeedbackModel, FeedbackPointModel } from './models/FeedbackModel';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import rehypePrism from 'rehype-prism-plus';
 import rehypeRewrite from "rehype-rewrite";
+import FeedbackModal from './FeedbackModal';
 
 
 
-function App() {
+const App = () => {
   const [code, setCode] = useState<string | undefined>(undefined);
   const [performanceLoading, setPerformanceLoading] = useState<boolean>(false);
   const [readabilityLoading, setReadabilityLoading] = useState<boolean>(false);
@@ -19,6 +20,8 @@ function App() {
   const [readabilityFeedback, setReadabilityFeedback] = useState<FeedbackModel | undefined>(undefined);
   const [advancedFeedback, setAdvancedFeedback] = useState<FeedbackModel | undefined>(undefined);
   const [hoveredPoint, setHoveredPoint] = useState<FeedbackPointModel | undefined>(undefined);
+  const [expandedPoint, setExpandedPoint] = useState<FeedbackPointModel | undefined>(undefined);
+  const [expandedPointModalOpen, setExpandedPointModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (!code) {
@@ -73,7 +76,7 @@ function App() {
   const scrollToDepth = (depth: number) => {
     if (codeEditorRef.current) {
       codeEditorRef.current.scrollTo({
-        top: depth,
+        top: depth + 50,
         behavior: 'smooth',
       });
     }
@@ -89,23 +92,26 @@ function App() {
     }
 
     if (!feedback) {
-      return <p>No feedback available</p>;
+      return <p></p>;
     }
 
     return feedback.feedbackPoints.map((point: FeedbackPointModel, _: number) => (
-      <FeedbackPoint key={point.title} language={feedback.language} initialCode={code} point={point} onLeave={() => {
+      <FeedbackPoint key={point.title} point={point} onLeave={() => {
         setHoveredPoint(undefined);
       }} onHover={(hoveredPoint) => {
         setHoveredPoint(hoveredPoint);
         scrollToDepth(hoveredPoint.getLinesToHighlight()[0] * 21);
+      }} onExpandClicked={() => {
+        setExpandedPoint(point);
+        setExpandedPointModalOpen(true);
       }} />
     ));
   }
 
   return (
-    <div style={{ display: 'flex', height: '100vh', margin: '12px' }}>
-      <div ref={codeEditorRef} style={{ flex: 1, padding: '12px', overflowY: 'auto' }}>
-        <h1>Code</h1>
+    <div style={{ display: 'flex', height: '100vh', margin: expandedPointModalOpen ? "0px" : '12px', position: 'relative' }}>
+      {expandedPointModalOpen && <div style={{ position: 'fixed', top: 0, right: 0, width: '50%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1 }}></div>}
+      <div ref={codeEditorRef} style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
         <CodeEditor
           value={code}
           language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"}
@@ -119,8 +125,10 @@ function App() {
               {
                 rewrite: (node: any, index: number) => {
                   if (node.properties?.className?.includes("code-line")) {
-                    if (hoveredPoint && hoveredPoint.line_numbers) {
-                      const linesToHighlight = getLinesToHighlight(hoveredPoint.line_numbers);
+                    const point = hoveredPoint || expandedPoint;
+
+                    if (point && point.line_numbers) {
+                      const linesToHighlight = getLinesToHighlight(point.line_numbers);
 
                       if (linesToHighlight.includes(index + 1)) {
                         node.properties.className.push("code_highlighted");
@@ -136,19 +144,22 @@ function App() {
           ]}
           style={{
             backgroundColor: "#f5f5f5",
+            minHeight: '100%',
             fontSize: 14,
             fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
           }}
         />
       </div>
-      <div style={{ flex: 1, padding: '12px', overflowY: 'auto' }}>
-        <h1>Feedback</h1>
-        <h2>Readability</h2>
+      <div style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
         {getFeedbackComponent(readabilityFeedback)}
-        <h2>Performance</h2>
         {getFeedbackComponent(performanceFeedback)}
-        <h2>Advanced</h2>
         {getFeedbackComponent(advancedFeedback)}
+        <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"} initialCode={code} isModalOpen={expandedPointModalOpen} onModalClose={
+          () => {
+            setExpandedPointModalOpen(false);
+            setExpandedPoint(undefined);
+          }
+        } />
       </div>
     </div >
   );

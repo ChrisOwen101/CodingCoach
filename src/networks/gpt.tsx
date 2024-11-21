@@ -77,7 +77,7 @@ const getSchema = () => (
                             },
                             "summary": {
                                 "type": "string",
-                                "description": "A very short summary of the problem"
+                                "description": "A very short summary of the problem, expained in the context of a beginner coder, without using any of the words in the title."
                             },
                             "description": {
                                 "type": "string",
@@ -94,6 +94,9 @@ const getSchema = () => (
                             "code_example": {
                                 "type": "string",
                                 "description": "A code example providing a solution or illustration related to the feedback."
+                            }, "type": {
+                                "type": "string",
+                                "enum": ["Performance", "Readability", "Advanced"]
                             }
                         },
                         "required": [
@@ -102,7 +105,8 @@ const getSchema = () => (
                             "code_example",
                             "questions",
                             "line_numbers",
-                            "summary"
+                            "summary",
+                            "type"
                         ],
                         "additionalProperties": false
                     }
@@ -165,7 +169,8 @@ export const getCodeFeedback = async (code: string, feedbackType: string): Promi
             point.questions,
             point.line_numbers,
             point.code_example,
-            point.summary));
+            point.summary,
+            point.type));
 
         return {
             feedbackType: feedbackType,
