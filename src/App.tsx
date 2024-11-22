@@ -83,12 +83,8 @@ const App = () => {
   };
 
   const getFeedbackComponent = (feedback: FeedbackModel | undefined) => {
-    if (feedback?.feedbackType === "Performance" && performanceLoading) {
-      return <p>Loading performance feedback...</p>;
-    } else if (feedback?.feedbackType === "Readability" && readabilityLoading) {
-      return <p>Loading readability feedback...</p>;
-    } else if (feedback?.feedbackType === "Advanced" && advancedLoading) {
-      return <p>Loading advanced feedback...</p>;
+    if (performanceLoading || readabilityLoading || advancedLoading) {
+      return <p>Loading feedback...</p>;
     }
 
     if (!feedback) {
