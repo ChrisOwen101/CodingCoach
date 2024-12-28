@@ -3,8 +3,8 @@ import { FeedbackModel, FeedbackPointModel } from '../models/FeedbackModel';
 
 const API_URL = 'https://api.openai.com/v1/chat/completions';
 
-//const MODEL_GPT_4O = 'gpt-4o';
-const MODEL_GPT_4O_MINI = 'gpt-4o-mini';
+const MODEL_GPT_4O = 'gpt-4o';
+// const MODEL_GPT_4O_MINI = 'gpt-4o-mini';
 // const MODEL_GPT_35_TURBO = 'gpt-3.5-turbo';
 
 interface ChatMessage {
@@ -149,7 +149,7 @@ export const getCodeFeedback = async (code: string, feedbackType: string): Promi
         const response = await axios.post(
             API_URL,
             {
-                model: MODEL_GPT_4O_MINI,
+                model: MODEL_GPT_4O,
                 messages: messages,
                 response_format: {
                     type: "json_schema",
@@ -209,7 +209,7 @@ export const continueConversation = async (initialCode: string | undefined, feed
         const response = await axios.post(
             API_URL,
             {
-                model: MODEL_GPT_4O_MINI,
+                model: MODEL_GPT_4O,
                 messages: [getConversationalCoach(), ...messages],
             },
             {
