@@ -23,12 +23,11 @@ const App = () => {
   const [expandedPoint, setExpandedPoint] = useState<FeedbackPointModel | undefined>(undefined);
   const [expandedPointModalOpen, setExpandedPointModalOpen] = useState<boolean>(false);
 
-  useEffect(() => {
+  const onSubmit = async (code: string) => {
     if (!code) {
       return;
     }
 
-    const fetchFeedback = async () => {
       try {
         setAdvancedLoading(true);
         setPerformanceLoading(true);
@@ -48,10 +47,20 @@ const App = () => {
       } catch (error) {
         console.error('Error fetching feedback:', error);
       }
-    };
+  }
 
-    fetchFeedback();
-  }, [code]);
+  const getFeedbackSidePanel = () => {
+    return <div> {getFeedbackComponent(readabilityFeedback, "Readability")}
+      {getFeedbackComponent(performanceFeedback, "Performance")}
+      {getFeedbackComponent(advancedFeedback, "Advanced")}
+      <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"} initialCode={code} isModalOpen={expandedPointModalOpen} onModalClose={
+        () => {
+          setExpandedPointModalOpen(false);
+          setExpandedPoint(undefined);
+        }
+      } />
+    </div>
+  }
 
   const getLinesToHighlight = (lineNumbers: string): number[] => {
     const lines: number[] = [];
@@ -75,16 +84,41 @@ const App = () => {
 
   const scrollToDepth = (depth: number) => {
     if (codeEditorRef.current) {
+      const containerHeight = codeEditorRef.current.clientHeight;
+      const scrollTop = depth - containerHeight / 2;
       codeEditorRef.current.scrollTo({
-        top: depth + 50,
+        top: scrollTop < 0 ? 0 : scrollTop,
         behavior: 'smooth',
       });
     }
   };
 
-  const getFeedbackComponent = (feedback: FeedbackModel | undefined) => {
-    if (performanceLoading || readabilityLoading || advancedLoading) {
-      return <p>Loading feedback...</p>;
+  const getIntroPanel = () => {
+    return <div>
+      <h1>Code Feedback</h1>
+      <p>Submit your code to get feedback on performance, readability and advanced topics.</p>
+      <button onClick={() => {
+        onSubmit(code || '');
+      }}>
+        Submit
+      </button>
+    </div>
+  }
+
+  const getFeedbackComponent = (feedback: FeedbackModel | undefined, type: string) => {
+    const loadingState: { [key: string]: boolean } = {
+      "Performance": performanceLoading,
+      "Readability": readabilityLoading,
+      "Advanced": advancedLoading
+    };
+
+    if (loadingState[type]) {
+      return (
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div className='spinner' />
+        <p style={{ marginLeft: '10px' }}>Loading {type.toLowerCase()} feedback...</p>
+      </div>
+      );
     }
 
     if (!feedback) {
@@ -104,10 +138,12 @@ const App = () => {
     ));
   }
 
+  const showIntroPanel = !performanceFeedback && !readabilityFeedback && !advancedFeedback && !performanceLoading && !readabilityLoading && !advancedLoading;
+
   return (
     <div style={{ display: 'flex', height: '100vh', margin: expandedPointModalOpen ? "0px" : '12px', position: 'relative' }}>
       {expandedPointModalOpen && <div style={{ position: 'fixed', top: 0, right: 0, width: '50%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1 }}></div>}
-      <div ref={codeEditorRef} style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
+      <div ref={codeEditorRef} style={{ position: 'relative', flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
         <CodeEditor
           value={code}
           language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"}
@@ -147,15 +183,7 @@ const App = () => {
         />
       </div>
       <div style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
-        {getFeedbackComponent(readabilityFeedback)}
-        {getFeedbackComponent(performanceFeedback)}
-        {getFeedbackComponent(advancedFeedback)}
-        <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"} initialCode={code} isModalOpen={expandedPointModalOpen} onModalClose={
-          () => {
-            setExpandedPointModalOpen(false);
-            setExpandedPoint(undefined);
-          }
-        } />
+        {showIntroPanel ? getIntroPanel() : getFeedbackSidePanel()}
       </div>
     </div >
   );
