@@ -6,8 +6,9 @@ export class FeedbackPointModel {
     code_example: string;
     summary: string;
     type: string;
+    severity: number;
 
-    constructor(title: string, description: string, questions: string, line_numbers: string, code_example: string, summary: string, type: string) {
+    constructor(title: string, description: string, questions: string, line_numbers: string, code_example: string, summary: string, type: string, severity: number) {
         this.title = title;
         this.description = description;
         this.questions = questions;
@@ -15,6 +16,7 @@ export class FeedbackPointModel {
         this.code_example = code_example;
         this.summary = summary;
         this.type = type;
+        this.severity = severity
     }
 
     getLinesToHighlight(): number[] {

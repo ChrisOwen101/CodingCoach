@@ -12,54 +12,143 @@ import FeedbackModal from './FeedbackModal';
 
 const App = () => {
   const [code, setCode] = useState<string | undefined>(undefined);
-  const [performanceLoading, setPerformanceLoading] = useState<boolean>(false);
-  const [readabilityLoading, setReadabilityLoading] = useState<boolean>(false);
-  const [advancedLoading, setAdvancedLoading] = useState<boolean>(false);
+  const [feedbackList, setFeedbackList] = useState<FeedbackPointModel[]>([]);
+  const [language, setLanguage] = useState<string | undefined>(undefined);
 
-  const [performanceFeedback, setPerformanceFeedback] = useState<FeedbackModel | undefined>(undefined);
-  const [readabilityFeedback, setReadabilityFeedback] = useState<FeedbackModel | undefined>(undefined);
-  const [advancedFeedback, setAdvancedFeedback] = useState<FeedbackModel | undefined>(undefined);
   const [hoveredPoint, setHoveredPoint] = useState<FeedbackPointModel | undefined>(undefined);
   const [expandedPoint, setExpandedPoint] = useState<FeedbackPointModel | undefined>(undefined);
   const [expandedPointModalOpen, setExpandedPointModalOpen] = useState<boolean>(false);
+  const [hasCodeChanged, setHasCodeChanged] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const onSubmit = async (code: string) => {
     if (!code) {
       return;
     }
 
-      try {
-        setAdvancedLoading(true);
-        setPerformanceLoading(true);
-        setReadabilityLoading(true);
-        getCodeFeedback(code, "Performance").then((feedback) => {
-          setPerformanceFeedback(feedback)
-          setPerformanceLoading(false);
-        });
-        getCodeFeedback(code, "Readability").then((feedback) => {
-          setReadabilityFeedback(feedback)
-          setReadabilityLoading(false);
-        });
-        getCodeFeedback(code, "Advanced").then((feedback) => {
-          setAdvancedFeedback(feedback)
-          setAdvancedLoading(false);
-        });
-      } catch (error) {
-        console.error('Error fetching feedback:', error);
-      }
+    try {
+      setHasCodeChanged(false);
+      setFeedbackList([]);
+      setIsLoading(true);
+      Promise.all([
+        getCodeFeedback(code, "Performance"),
+        getCodeFeedback(code, "Readability"),
+        getCodeFeedback(code, "Advanced"),
+        getCodeFeedback(code, "Bug"),
+      ]).then(([perf, read, adv, bug]) => {
+        setLanguage(perf.language);
+
+        const combinedPoints = [
+          ...perf.feedbackPoints,
+          ...read.feedbackPoints,
+          ...adv.feedbackPoints,
+          ...bug.feedbackPoints,
+        ];
+
+        combinedPoints.sort((a, b) => b.severity - a.severity);
+        setFeedbackList(combinedPoints);
+        setIsLoading(false);
+      });
+    } catch (error) {
+      console.error('Error fetching feedback:', error);
+    }
+  }
+
+  const getReloadMessage = () => {
+    return <div>
+      <div className="alert alert-primary" role="alert">
+        Your code has changed; click submit to get new feedback.
+        <br />
+        <br />
+        {getSubmitButton()}
+      </div>
+    </div>
+  }
+
+  const getLoadingPanel = () => {
+    return <div className="spinner" role="status">
+      <span className="visually-hidden">Loading...</span>
+    </div>
   }
 
   const getFeedbackSidePanel = () => {
-    return <div> {getFeedbackComponent(readabilityFeedback, "Readability")}
-      {getFeedbackComponent(performanceFeedback, "Performance")}
-      {getFeedbackComponent(advancedFeedback, "Advanced")}
-      <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"} initialCode={code} isModalOpen={expandedPointModalOpen} onModalClose={
-        () => {
-          setExpandedPointModalOpen(false);
-          setExpandedPoint(undefined);
-        }
-      } />
-    </div>
+    const getSeverityColor = (severity: number) => {
+      switch (severity) {
+        case 5: return '#f8d7da';  // critical
+        case 4: return '#fff3cd';  // high
+        case 3: return '#d1ecf1';  // medium
+        case 2: return '#e2e3e5';  // low
+        default: return '#fefefe'; // informational
+      }
+    };
+
+    const getSeverityLabel = (severity: number) => {
+      switch (severity) {
+        case 5: return 'Critical';
+        case 4: return 'High';
+        case 3: return 'Medium';
+        case 2: return 'Low';
+        default: return 'Informational';
+      }
+    };
+
+    const groupedBySeverity = feedbackList.reduce((acc, point) => {
+      (acc[point.severity] = acc[point.severity] || []).push(point);
+      return acc;
+    }, {} as Record<number, FeedbackPointModel[]>);
+
+    return (
+      <div>
+        {hasCodeChanged && getReloadMessage()}
+        {Object.keys(groupedBySeverity).sort((a, b) => Number(b) - Number(a)).map(sev => {
+          const severity = Number(sev);
+          return (
+            <div
+              key={sev}
+              style={{
+                backgroundColor: getSeverityColor(severity),
+                padding: '10px',
+                marginBottom: '10px',
+                borderRadius: '8px'
+              }}
+            >
+              <h4>{getSeverityLabel(severity)}</h4>
+              {groupedBySeverity[severity].map((point, idx) => (
+                <FeedbackPoint
+                  key={idx}
+                  point={point}
+                  onLeave={() => {
+                    setHoveredPoint(undefined);
+                  }}
+                  onHover={(hoveredPoint) => {
+                    setHoveredPoint(hoveredPoint);
+                    scrollToDepth(hoveredPoint.getLinesToHighlight()[0] * 21);
+                  }}
+                  onExpandClicked={() => {
+                    setExpandedPoint(point);
+                    setExpandedPointModalOpen(true);
+                  }}
+                />
+              ))}
+            </div>
+          );
+        })}
+        <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={language ? language : "text"} initialCode={code} isModalOpen={expandedPointModalOpen} onModalClose={
+          () => {
+            setExpandedPointModalOpen(false);
+            setExpandedPoint(undefined);
+          }
+        } />
+      </div>
+    );
+  }
+
+  const getSubmitButton = () => {
+    return <button type="button" className="btn btn-primary" onClick={() => {
+      onSubmit(code || '');
+    }}>
+      Submit
+    </button>
   }
 
   const getLinesToHighlight = (lineNumbers: string): number[] => {
@@ -97,48 +186,19 @@ const App = () => {
     return <div>
       <h1>Code Feedback</h1>
       <p>Submit your code to get feedback on performance, readability and advanced topics.</p>
-      <button onClick={() => {
-        onSubmit(code || '');
-      }}>
-        Submit
-      </button>
+      <p>Feedback is categorized by severity:</p>
+      <ul>
+        <li><strong>Critical</strong>: Important issues that need attention to ensure your code runs smoothly.</li>
+        <li><strong>High</strong>: Significant improvements that can enhance your code's performance or functionality.</li>
+        <li><strong>Medium</strong>: Useful suggestions to make your code more efficient and effective.</li>
+        <li><strong>Low</strong>: Minor tweaks that can help polish your code.</li>
+        <li><strong>Informational</strong>: Helpful tips and best practices to consider.</li>
+      </ul>
+      {getSubmitButton()}
     </div>
   }
 
-  const getFeedbackComponent = (feedback: FeedbackModel | undefined, type: string) => {
-    const loadingState: { [key: string]: boolean } = {
-      "Performance": performanceLoading,
-      "Readability": readabilityLoading,
-      "Advanced": advancedLoading
-    };
-
-    if (loadingState[type]) {
-      return (
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <div className='spinner' />
-        <p style={{ marginLeft: '10px' }}>Loading {type.toLowerCase()} feedback...</p>
-      </div>
-      );
-    }
-
-    if (!feedback) {
-      return <p></p>;
-    }
-
-    return feedback.feedbackPoints.map((point: FeedbackPointModel, _: number) => (
-      <FeedbackPoint key={point.title} point={point} onLeave={() => {
-        setHoveredPoint(undefined);
-      }} onHover={(hoveredPoint) => {
-        setHoveredPoint(hoveredPoint);
-        scrollToDepth(hoveredPoint.getLinesToHighlight()[0] * 21);
-      }} onExpandClicked={() => {
-        setExpandedPoint(point);
-        setExpandedPointModalOpen(true);
-      }} />
-    ));
-  }
-
-  const showIntroPanel = !performanceFeedback && !readabilityFeedback && !advancedFeedback && !performanceLoading && !readabilityLoading && !advancedLoading;
+  const showIntroPanel = feedbackList.length === 0;
 
   return (
     <div style={{ display: 'flex', height: '100vh', margin: expandedPointModalOpen ? "0px" : '12px', position: 'relative' }}>
@@ -146,9 +206,14 @@ const App = () => {
       <div ref={codeEditorRef} style={{ position: 'relative', flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
         <CodeEditor
           value={code}
-          language={performanceFeedback?.language || readabilityFeedback?.language || advancedFeedback?.language || "text"}
+          language={feedbackList.length > 0 ? language : "text"}
           placeholder="Copy and paste your code here"
-          onChange={(evn) => setCode(evn.target.value)}
+          onChange={(evn) => {
+            console.log(code)
+            setHasCodeChanged(code !== undefined);
+            setCode(evn.target.value)
+          }
+          }
           padding={15}
           rehypePlugins={[
             [rehypePrism, { ignoreMissing: true }],
@@ -183,7 +248,7 @@ const App = () => {
         />
       </div>
       <div style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
-        {showIntroPanel ? getIntroPanel() : getFeedbackSidePanel()}
+        {isLoading ? getLoadingPanel() : showIntroPanel ? getIntroPanel() : getFeedbackSidePanel()}
       </div>
     </div >
   );

@@ -35,8 +35,6 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ point, isModalOpen, langu
         onModalClose();
     };
 
-    console.log(isModalOpen)
-
     return (
         <>
             {<div className={`modal fade ${isModalOpen ? 'show' : ''}`} style={{ display: isModalOpen ? 'block' : 'none', position: 'fixed', top: 0, right: 0, width: '50%', height: '100%', marginLeft: 'auto' }}>

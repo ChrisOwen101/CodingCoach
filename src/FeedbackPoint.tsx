@@ -27,6 +27,8 @@ const FeedbackPoint: React.FC<FeedbackProps> = ({ point, onHover, onLeave, onExp
                 return { backgroundColor: '#a8c5d5', color: '#000' };
             case 'advanced':
                 return { backgroundColor: '#d5c5a8', color: '#000' };
+            case 'bug':
+                return { backgroundColor: '#ff9994', color: '#000' };
             default:
                 return { backgroundColor: '#d5d5d5', color: '#000' };
         }

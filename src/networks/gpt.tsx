@@ -19,14 +19,23 @@ const getBaseCoach = (area: string): string => (
     
     All feedback should be in markdown format. All titles used should use H3 as the largest heading.
     
-    Always give at least five feedback points.`
+    Always give at least four feedback points.`
 )
 
 const getAdvancedTechniquesCoach = (): ChatMessage => ({
     role: 'system',
-    content: `${getBaseCoach("advanced techniques and best practices")}
+    content: `${getBaseCoach("Advanced Programming Techniques")}
     
     You should focus only on teaching the user advanced techniques and best practices. Explain how they could improve their code by using techniques, approaches, syntax, patterns and language features that they might not be familiar with.
+    
+    Do not feature feedback anything to do with Performance or Readability. Only give feedback on the Advanced Techniques as shown above.`
+});
+
+const getBugCoach = (): ChatMessage => ({
+    role: 'system',
+    content: `${getBaseCoach("Bugs and Errors")}
+    
+    You should focus on identifying and explaining bugs and errors in the code. This might include syntax errors, runtime errors, or logical errors. Do not give away the solution, but provide hints and guidance on how to fix the issue. Try to coach the user of understanding the error and how to debug it.
     
     Do not feature feedback anything to do with Performance or Readability. Only give feedback on the Advanced Techniques as shown above.`
 });
@@ -100,7 +109,10 @@ const getSchema = () => (
                                 "description": "A code example providing a solution or illustration related to the feedback."
                             }, "type": {
                                 "type": "string",
-                                "enum": ["Performance", "Readability", "Advanced"]
+                                "enum": ["Performance", "Readability", "Advanced", "Bug"],
+                            }, "severity": {
+                                "type": "integer",
+                                "description": "The severity of the feedback. 1 is the lowest severity and 5 is the highest. The severity should be classified as 5=Critical, 4=High, 3=Medium, 2=Low, 1=Informational."
                             }
                         },
                         "required": [
@@ -110,7 +122,8 @@ const getSchema = () => (
                             "questions",
                             "line_numbers",
                             "summary",
-                            "type"
+                            "type", 
+                            "severity"
                         ],
                         "additionalProperties": false
                     }
@@ -145,6 +158,8 @@ export const getCodeFeedback = async (code: string, feedbackType: string): Promi
         messages.unshift(getAdvancedTechniquesCoach());
     } else if (feedbackType.toLowerCase() === 'performance') {
         messages.unshift(getPerformanceCoach());
+    } else if (feedbackType.toLowerCase() === 'bug') {
+        messages.unshift(getBugCoach());
     }
 
     try {
@@ -174,7 +189,8 @@ export const getCodeFeedback = async (code: string, feedbackType: string): Promi
             point.line_numbers,
             point.code_example,
             point.summary,
-            point.type));
+            point.type, 
+            point.severity));
 
         return {
             feedbackType: feedbackType,
