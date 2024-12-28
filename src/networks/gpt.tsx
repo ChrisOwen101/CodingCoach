@@ -122,7 +122,7 @@ const getSchema = () => (
                             "questions",
                             "line_numbers",
                             "summary",
-                            "type", 
+                            "type",
                             "severity"
                         ],
                         "additionalProperties": false
@@ -189,7 +189,7 @@ export const getCodeFeedback = async (code: string, feedbackType: string): Promi
             point.line_numbers,
             point.code_example,
             point.summary,
-            point.type, 
+            point.type,
             point.severity));
 
         return {

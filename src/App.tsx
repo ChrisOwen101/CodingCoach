@@ -1,8 +1,8 @@
 import './App.css'
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { getCodeFeedback } from './networks/gpt';
 import FeedbackPoint from './FeedbackPoint';
-import { FeedbackModel, FeedbackPointModel } from './models/FeedbackModel';
+import { FeedbackPointModel } from './models/FeedbackModel';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import rehypePrism from 'rehype-prism-plus';
 import rehypeRewrite from "rehype-rewrite";
@@ -30,20 +30,29 @@ const App = () => {
       setHasCodeChanged(false);
       setFeedbackList([]);
       setIsLoading(true);
-      Promise.all([
-        getCodeFeedback(code, "Performance"),
-        getCodeFeedback(code, "Readability"),
-        getCodeFeedback(code, "Advanced"),
-        getCodeFeedback(code, "Bug"),
-      ]).then(([perf, read, adv, bug]) => {
-        setLanguage(perf.language);
 
-        const combinedPoints = [
-          ...perf.feedbackPoints,
-          ...read.feedbackPoints,
-          ...adv.feedbackPoints,
-          ...bug.feedbackPoints,
-        ];
+      const feedbackTypes = ["Performance", "Readability", "Advanced", "Bug"];
+      const feedbackPromises = feedbackTypes.map(type => getCodeFeedback(code, type));
+
+      Promise.allSettled(feedbackPromises).then(results => {
+        const combinedPoints: FeedbackPointModel[] = [];
+        let detectedLanguage: string | undefined;
+
+        results.forEach((result, index) => {
+          if (result.status === "fulfilled") {
+            const feedback = result.value;
+            if (!detectedLanguage) {
+              detectedLanguage = feedback.language;
+            }
+            combinedPoints.push(...feedback.feedbackPoints);
+          } else {
+            console.error(`Error fetching ${feedbackTypes[index]} feedback:`, result.reason);
+          }
+        });
+
+        if (detectedLanguage) {
+          setLanguage(detectedLanguage);
+        }
 
         combinedPoints.sort((a, b) => b.severity - a.severity);
         setFeedbackList(combinedPoints);
@@ -55,14 +64,12 @@ const App = () => {
   }
 
   const getReloadMessage = () => {
-    return <div>
-      <div className="alert alert-primary" role="alert">
+    return <div className="alert alert-primary" role="alert">
         Your code has changed; click submit to get new feedback.
         <br />
         <br />
         {getSubmitButton()}
       </div>
-    </div>
   }
 
   const getLoadingPanel = () => {
@@ -209,9 +216,11 @@ const App = () => {
           language={feedbackList.length > 0 ? language : "text"}
           placeholder="Copy and paste your code here"
           onChange={(evn) => {
-            console.log(code)
-            setHasCodeChanged(code !== undefined);
-            setCode(evn.target.value)
+            const newCode = evn.target.value;
+            if (newCode !== code) {
+              setHasCodeChanged(true);
+              setCode(newCode);
+            }
           }
           }
           padding={15}
