@@ -1,57 +1,104 @@
-import React from 'react';
 import axios from 'axios';
 
-const CLIENT_ID = 'your_github_client_id';
-const CLIENT_SECRET = 'your_github_client_secret';
-const REDIRECT_URI = 'http://localhost:3000/callback';
 
-export const GitHubLogin = () => {
-    const handleLogin = () => {
-        window.location.href = `https://github.com/login/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}`;
+export interface RepoContent {
+    name: string;
+    type: 'file' | 'dir';
+    path?: string;
+    sha?: string;
+    size?: number;
+    url?: string;
+    html_url?: string;
+    git_url?: string;
+    download_url?: string;
+    children?: RepoContent[];
+    _links?: {
+        self: string;
+        git: string;
+        html: string;
     };
+}
 
-    return (
-        <button onClick={handleLogin}>Login with GitHub</button>
-    );
+
+export const getUserRepos = async (accessToken: string) => {
+  try {
+    const response = await axios.get('https://api.github.com/user/repos', {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Accept': 'application/vnd.github.v3+json',
+      },
+      params: {
+        visibility: 'all', // Retrieve both public and private repositories
+        sort: 'pushed', // Sort repositories by the date they were last updated
+        affiliation: 'owner, collaborator', // Retrieve repositories that the authenticated user owns
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching user repositories:', error);
+    throw error;
+  }
 };
 
-export const GitHubCallback = () => {
-    React.useEffect(() => {
-        const code = new URLSearchParams(window.location.search).get('code');
-        if (code) {
-            axios.post(`https://github.com/login/oauth/access_token`, {
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET,
-                code,
-                redirect_uri: REDIRECT_URI,
-            }, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                const accessToken = response.data.access_token;
-                getGitHubRepos(accessToken);
-            }).catch(error => {
-                console.error('Error getting access token:', error);
-            });
-        }
-    }, []);
-
-    const getGitHubRepos = (accessToken: string) => {
-        axios.get('https://api.github.com/user/repos', {
+export const getRepoContent = async (accessToken: string, repo_full_name: string, path: string = ''): Promise<RepoContent> => {
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${repo_full_name}/contents/${path}`, {
             headers: {
-                'Authorization': `token ${accessToken}`
-            }
-        }).then(response => {
-            console.log('User Repos:', response.data);
-        }).catch(error => {
-            console.error('Error fetching repos:', error);
+                'Authorization': `Bearer ${accessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+            },
         });
-    };
 
-    return (
-        <div>
-            <h1>GitHub Callback</h1>
-        </div>
-    );
+        const contents = response.data;
+
+        let result: RepoContent = {
+            name: path || repo_full_name,
+            type: 'dir',
+            children: []
+        };
+
+        for (const item of contents) {
+            if (item.type === 'file') {
+                result.children!.push(item);
+            } else if (item.type === 'dir') {
+                const dirContent = await getRepoContent(accessToken, repo_full_name, item.path);
+                result.children!.push(dirContent);
+            }
+        }
+
+        // Filter out non-code files
+        result.children = result.children!.filter((file: any) => {
+            if (file.type === 'file') {
+                const ext = file.name.split('.').pop();
+                return ['js', 'ts', 'jsx', 'tsx', 'py', 'java', 'rb', 'c', 'cpp', 'h', 'html', 'css', 'scss', 'sass', 'less'].includes(ext);
+            }
+            return true;
+        });
+
+        return result;
+    } catch (error) {
+        console.error('Error fetching repository content:', error);
+        throw error;
+    }
 };
+
+export const getRepoFile = async (accessToken: string, repo_full_name: string, path: string): Promise<string> => {
+    try {
+        const response = await axios.get(`https://api.github.com/repos/${repo_full_name}/contents/${path}`, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+            },
+        });
+
+        const content = response.data.content;
+        return atob(content);
+
+    } catch (error) {
+        console.error('Error fetching repository content:', error);
+        throw error;
+    }
+
+}
+

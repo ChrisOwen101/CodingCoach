@@ -1,11 +1,16 @@
 import { createContext, useContext, useMemo, ReactNode } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import { useNavigate } from "react-router-dom";
-import { useLocalStorage } from "./useLocalStorage";
+import { getUser, setUser } from "./localStorage";
 
 interface AuthContextType {
-  user: any;
-  login: (data: any) => Promise<void>;
+  getUser: any;
   logout: () => void;
+  loginWithGithub: () => Promise<void>;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  setUser: any;
+  user: any;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -15,26 +20,29 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useLocalStorage("user", null);
+  const { loginWithRedirect, user, isAuthenticated, isLoading } = useAuth0();
   const navigate = useNavigate();
 
-  const login = async (data: any) => {
-    setUser(data);
-    navigate("/CodingCoach/review");
+  const logout = () => {
+    setUser(undefined);
+    navigate("/CodingCoach/", { replace: true });
   };
 
-  const logout = () => {
-    setUser(null);
-    navigate("/CodingCoach/", { replace: true });
+  const loginWithGithub = async () => {
+    await loginWithRedirect()
   };
 
   const value = useMemo(
     () => ({
-      user,
-      login,
+      getUser,
       logout,
+      loginWithGithub,
+      isAuthenticated,
+      isLoading,
+      setUser,
+      user
     }),
-    [user]
+    [getUser, isAuthenticated, isLoading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

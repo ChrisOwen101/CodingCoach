@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getCodeFeedback } from './networks/gpt';
 import FeedbackPoint from './FeedbackPoint';
 import { FeedbackPointModel } from './models/FeedbackModel';
@@ -7,11 +7,16 @@ import CodeEditor from '@uiw/react-textarea-code-editor';
 import rehypePrism from 'rehype-prism-plus';
 import rehypeRewrite from "rehype-rewrite";
 import FeedbackModal from './FeedbackModal';
-
-
+import { getGithubToken } from './networks/auth0';
+import {  getRepoFile } from './networks/github';
+import { useAuth } from "./hooks/useAuth";
+import { useLocation } from 'react-router';
 
 const App = () => {
-  const [code, setCode] = useState<string | undefined>(undefined);
+  const { state } = useLocation();
+  const fileContents = state?.fileContents
+
+  const [code, setCode] = useState<string | undefined>(fileContents ?? undefined);
   const [feedbackList, setFeedbackList] = useState<FeedbackPointModel[]>([]);
   const [language, setLanguage] = useState<string | undefined>(undefined);
 
@@ -65,11 +70,11 @@ const App = () => {
 
   const getReloadMessage = () => {
     return <div className="alert alert-primary" role="alert">
-        Your code has changed; click submit to get new feedback.
-        <br />
-        <br />
-        {getSubmitButton()}
-      </div>
+      Your code has changed; click submit to get new feedback.
+      <br />
+      <br />
+      {getSubmitButton()}
+    </div>
   }
 
   const getLoadingPanel = () => {
