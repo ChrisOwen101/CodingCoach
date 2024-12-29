@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { getCodeFeedback } from './networks/gpt';
 import FeedbackPoint from './FeedbackPoint';
 import { FeedbackPointModel } from './models/FeedbackModel';
@@ -7,9 +7,6 @@ import CodeEditor from '@uiw/react-textarea-code-editor';
 import rehypePrism from 'rehype-prism-plus';
 import rehypeRewrite from "rehype-rewrite";
 import FeedbackModal from './FeedbackModal';
-import { getGithubToken } from './networks/auth0';
-import {  getRepoFile } from './networks/github';
-import { useAuth } from "./hooks/useAuth";
 import { useLocation } from 'react-router';
 
 const App = () => {

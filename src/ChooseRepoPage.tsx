@@ -2,19 +2,19 @@ import './App.css'
 import { useState, useEffect } from 'react';
 import { useAuth } from "./hooks/useAuth";
 import { getGithubToken } from './networks/auth0';
-import { getRepoContent, getRepoFile, getUserRepos, RepoContent } from './networks/github';
+import { getRepoContent, getRepoFile, getUserRepos, RepoContent, Repo } from './networks/github';
 import { useNavigate } from 'react-router-dom';
-import { getStoredRepoFiles, getStoredRepoList, getUser, setStoredRepoFiles, setStoredRepoList } from './hooks/localStorage';
+import { getStoredRepoFiles, getStoredRepoList, setStoredRepoFiles, setStoredRepoList } from './hooks/localStorage';
 
 const ChooseRepo = () => {
   const navigate = useNavigate();
   const { user } = useAuth();  
-
-  const [repos, setRepos] = useState<any[]>([]);
-  const [contents, setContents] = useState<RepoContent[]>([]);
+  
+  const [repos, setRepos] = useState<Repo[]>([]);
+  const [contents, setContents] = useState<RepoContent | undefined>(undefined);
   
   const [chosenRepo, setChosenRepo] = useState<string>('');
-  const [chosenFile, setChosenFile] = useState<string>('');
+  const [chosenFile, setChosenFile] = useState<string | undefined>('');
 
 
   useEffect(() => {
@@ -104,7 +104,7 @@ const ChooseRepo = () => {
 
       <h1>Choose a file</h1>
       <ul>
-        {contents.children && contents.children.map((content: any) => renderRepoContent(content))}
+        {contents && contents.children && contents.children.map((content: any) => renderRepoContent(content))}
       </ul>
     </div>
   );
