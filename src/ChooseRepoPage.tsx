@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from "./hooks/useAuth";
 import { getGithubToken } from './networks/auth0';
 import { getRepoContent, getRepoFile, getUserRepos, searchRepos, RepoContent, Repo } from './networks/github';
@@ -76,7 +76,6 @@ const ChooseRepo = () => {
     const loadFile = async () => {
       const token = await getGithubToken(user.sub);
       const fileContents = await getRepoFile(token, chosenRepo, chosenFile);
-      console.log(fileContents);
       navigate('/', {
         state: {
           fileContents
@@ -87,18 +86,15 @@ const ChooseRepo = () => {
     loadFile();
   }, [chosenFile]);
 
-  const handleSearch = async () => {
-    if (!searchQuery) {
-      return;
-    }
-
+  const handleSearch = useCallback(async () => {
+    if (!searchQuery) return;
     setReposLoading(true);
-    const token = await getGithubToken(user.sub);
-    const username = user.nickname;
+    const token = await getGithubToken(user?.sub ?? '');
+    const username = user?.nickname ?? '';
     const results = await searchRepos(token, searchQuery, username);
     setSearchResults(results);
     setReposLoading(false);
-  };
+  }, [searchQuery, user]);
 
   const renderRepoContent = (content: RepoContent) => {
     if (content.type === 'file') {

@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { getCodeFeedback } from './networks/gpt';
 import FeedbackPoint from './FeedbackPoint';
 import { FeedbackPointModel } from './models/FeedbackModel';
@@ -9,6 +9,8 @@ import rehypeRewrite from "rehype-rewrite";
 import FeedbackModal from './FeedbackModal';
 import { useLocation } from 'react-router';
 import NavBar from './NavBar';
+
+const FEEDBACK_TYPES = ["Performance", "Readability", "Advanced", "Bug"];
 
 const App = () => {
   const { state } = useLocation();
@@ -23,7 +25,7 @@ const App = () => {
   const [hasCodeChanged, setHasCodeChanged] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const onSubmit = async (code: string) => {
+  const onSubmit = useCallback(async (code: string) => {
     if (!code) {
       return;
     }
@@ -33,8 +35,7 @@ const App = () => {
       setFeedbackList([]);
       setIsLoading(true);
 
-      const feedbackTypes = ["Performance", "Readability", "Advanced", "Bug"];
-      const feedbackPromises = feedbackTypes.map(type => getCodeFeedback(code, type));
+      const feedbackPromises = FEEDBACK_TYPES.map(type => getCodeFeedback(code, type));
 
       Promise.allSettled(feedbackPromises).then(results => {
         const combinedPoints: FeedbackPointModel[] = [];
@@ -48,7 +49,7 @@ const App = () => {
             }
             combinedPoints.push(...feedback.feedbackPoints);
           } else {
-            console.error(`Error fetching ${feedbackTypes[index]} feedback:`, result.reason);
+            console.error(`Error fetching ${FEEDBACK_TYPES[index]} feedback:`, result.reason);
           }
         });
 
@@ -63,7 +64,7 @@ const App = () => {
     } catch (error) {
       console.error('Error fetching feedback:', error);
     }
-  }
+  }, [code]);
 
   const getReloadMessage = () => {
     return <div className="alert alert-primary" role="alert">
@@ -150,9 +151,7 @@ const App = () => {
   }
 
   const getSubmitButton = () => {
-    return <button type="button" className="btn btn-primary" onClick={() => {
-      onSubmit(code || '');
-    }}>
+    return <button type="button" className="btn btn-primary" onClick={() => onSubmit(code || '')}>
       Submit
     </button>
   }
