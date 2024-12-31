@@ -20,7 +20,6 @@ const App = () => {
 
   const [hoveredPoint, setHoveredPoint] = useState<FeedbackPointModel | undefined>(undefined);
   const [expandedPoint, setExpandedPoint] = useState<FeedbackPointModel | undefined>(undefined);
-  const [expandedPointModalOpen, setExpandedPointModalOpen] = useState<boolean>(false);
   const [hasCodeChanged, setHasCodeChanged] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -82,6 +81,10 @@ const App = () => {
   }
 
   const getFeedbackSidePanel = () => {
+    if (expandedPoint) {
+      return <></>
+    }
+
     const getSeverityColor = (severity: number) => {
       switch (severity) {
         case 5: return '#74a57d';  // critical
@@ -136,19 +139,12 @@ const App = () => {
                   }}
                   onExpandClicked={() => {
                     setExpandedPoint(point);
-                    setExpandedPointModalOpen(true);
                   }}
                 />
               ))}
             </div>
           );
         })}
-        <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={language ? language : "text"} initialCode={code} isModalOpen={expandedPointModalOpen} onModalClose={
-          () => {
-            setExpandedPointModalOpen(false);
-            setExpandedPoint(undefined);
-          }
-        } />
       </div>
     );
   }
@@ -194,8 +190,7 @@ const App = () => {
 
   const getIntroPanel = () => {
     return <div>
-      <h1>Code Feedback</h1>
-      <p>Submit your code to get feedback on performance, readability and advanced topics.</p>
+      <p>Submit your code to get feedback on performance, readability, bugs and advanced topics.</p>
       <p>Feedback is categorized by severity:</p>
       <ul>
         <li><strong>Critical</strong>: Important issues that need attention to ensure your code runs smoothly.</li>
@@ -214,7 +209,7 @@ const App = () => {
     <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', margin: 0, overflow: 'hidden' }}>
       <NavBar />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        <div ref={codeEditorRef} style={{ position: 'relative', flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
+        <div ref={codeEditorRef} style={{ position: 'relative', flex: 1, padding: '12px', overflowY: 'auto', zIndex: 0 }}>
           <CodeEditor
             value={code}
             language={feedbackList.length > 0 ? language : "text"}
@@ -262,10 +257,15 @@ const App = () => {
             }}
           />
         </div>
-        <div style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
+        <div style={{ flex: 1, padding: '12px', overflowY: 'auto', zIndex: 0 }}>
           {isLoading ? getLoadingPanel() : showIntroPanel ? getIntroPanel() : getFeedbackSidePanel()}
         </div>
       </div>
+      <FeedbackModal point={expandedPoint || { title: 'Loading', description: '', questions: '', line_numbers: '', code_example: '', summary: '' } as FeedbackPointModel} language={language ? language : "text"} initialCode={code} isModalOpen={expandedPoint !== undefined} onModalClose={
+        () => {
+          setExpandedPoint(undefined);
+        }
+      } />
     </div>
   );
 }

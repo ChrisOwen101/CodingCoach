@@ -37,7 +37,7 @@ const FeedbackModal: React.FC<FeedbackModalProps> = ({ point, isModalOpen, langu
 
     return (
         <>
-            {<div className={`modal fade ${isModalOpen ? 'show' : ''}`} style={{ display: isModalOpen ? 'block' : 'none', position: 'fixed', top: 0, right: 0, width: '50%', height: '100%', marginLeft: 'auto' }}>
+            {<div className={`modal fade ${isModalOpen ? 'show' : ''}`} style={{ display: isModalOpen ? 'block' : 'none', position: 'fixed', top: "11%", right: 0, bottom: 0, width: '50%', marginLeft: 'auto', height: '88%', paddingLeft: "10px", paddingRight: "20px" }} tabIndex={-1} aria-labelledby="staticBackdropLabel" aria-hidden="true">
                 <div className="modal-dialog modal-dialog-scrollable" style={{ height: '100%', margin: 0, maxWidth: '100%' }}>
                     <div className="modal-content" style={{ height: '100%' }}>
                         <div className="modal-header">
