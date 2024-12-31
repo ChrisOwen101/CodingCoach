@@ -117,8 +117,8 @@ const App = () => {
               key={sev}
               style={{
                 backgroundColor: getSeverityColor(severity),
-                padding: '10px',
-                marginBottom: '10px',
+                padding: '16px',
+                marginBottom: '32px',
                 borderRadius: '8px'
               }}
             >
@@ -253,6 +253,8 @@ const App = () => {
               ]
             ]}
             style={{
+              marginLeft: '12px',
+              borderRadius: '8px',
               backgroundColor: "#f5f5f5",
               minHeight: '100%',
               fontSize: 14,

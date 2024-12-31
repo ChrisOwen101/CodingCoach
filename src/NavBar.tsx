@@ -1,8 +1,6 @@
-import React from 'react';
-
 function NavBar() {
     return (
-        <nav className="navbar bg-primary navbar-expand-lg" data-bs-theme="dark" style={{ margin: '24px', padding: '12px' }}>
+        <nav className="navbar bg-primary navbar-expand-lg" data-bs-theme="dark" style={{ margin: '24px', padding: '12px', borderRadius: '8px' }}>
             <div className="container-fluid">
                 <span className="navbar-brand mb-0 h1">
                     AiCodingCoach

@@ -25,7 +25,7 @@ export interface Repo {
     name: string;
 }
 
-export const getUserRepos = async (accessToken: string) => {
+export const getUserRepos = async (accessToken: string, limit: number = 10) => {
     try {
         const response = await axios.get('https://api.github.com/user/repos', {
             headers: {
@@ -35,7 +35,8 @@ export const getUserRepos = async (accessToken: string) => {
             params: {
                 visibility: 'all', // Retrieve both public and private repositories
                 sort: 'pushed', // Sort repositories by the date they were last updated
-                affiliation: 'owner, collaborator', // Retrieve repositories that the authenticated user owns
+                affiliation: 'owner, collaborator', // Retrieve repositories that the authenticated user owns,
+                per_page: limit, // Limit the number of repositories to retrieve,
             },
         });
 
@@ -106,4 +107,24 @@ export const getRepoFile = async (accessToken: string, repo_full_name: string, p
     }
 
 }
+
+export const searchRepos = async (accessToken: string, query: string, username: string) => {
+    try {
+        const response = await axios.get('https://api.github.com/search/repositories', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+            },
+            params: {
+                q: `${query} user:${username} in:name`,
+            },
+        });
+
+        return response.data.items;
+    } catch (error) {
+
+        console.error('Error searching repositories:', error);
+        throw error;
+    }
+};
 
