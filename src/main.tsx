@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import App from './App.tsx'
 import './scss/styles.scss'
 import LoginPage from './LoginPage';
@@ -20,22 +20,21 @@ createRoot(document.getElementById('root')!).render(
         redirect_uri: window.location.origin + '/CodingCoach/'
       }}
     >
-      <BrowserRouter>
+      <HashRouter>
         <AuthProvider>
           <Routes>
-            <Route path="/CodingCoach/" element={<LoginPage />} />
-            <Route path="/CodingCoach/login" element={<LoginPage />} />
-            <Route path="/CodingCoach/repo" element={
-              <ProtectedRoute>
-                <ChooseRepo />
-              </ProtectedRoute>} />
-            <Route path="/CodingCoach/review" element={
+            <Route path="/" element={
               <ProtectedRoute>
                 <App />
               </ProtectedRoute>} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/import" element={
+              <ProtectedRoute>
+                <ChooseRepo />
+              </ProtectedRoute>} />
           </Routes>
         </AuthProvider>
-      </BrowserRouter>
+      </HashRouter>
     </Auth0Provider>
   </StrictMode>,
 )

@@ -6,7 +6,7 @@ const LoginPage = () => {
 
     if (isAuthenticated) {
         setUser(user);
-        return <Navigate to="/CodingCoach/review" />;
+        return <Navigate to="/" />;
     }
 
     return (

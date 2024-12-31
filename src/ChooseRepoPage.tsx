@@ -77,7 +77,7 @@ const ChooseRepo = () => {
       const token = await getGithubToken(user.sub);
       const fileContents = await getRepoFile(token, chosenRepo, chosenFile);
       console.log(fileContents);
-      navigate('/CodingCoach/review', {
+      navigate('/', {
         state: {
           fileContents
         }

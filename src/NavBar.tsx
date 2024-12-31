@@ -12,12 +12,12 @@ function NavBar() {
                     <nav>
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <li className="nav-item">
-                                <NavLink className="nav-link" to="/CodingCoach/review" end>
+                                <NavLink className="nav-link" to="/" end>
                                     Home
                                 </NavLink>
                             </li>
                             <li className="nav-item">
-                                <NavLink className="nav-link" to="/CodingCoach/repo" end>
+                                <NavLink className="nav-link" to="/import" end>
                                     Import from Github
                                 </NavLink>
                             </li>
