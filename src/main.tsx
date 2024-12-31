@@ -10,6 +10,7 @@ import { ProtectedRoute } from './routes/ProtectedRoute';
 import { Auth0Provider } from '@auth0/auth0-react';
 import ChooseRepo from './ChooseRepoPage.tsx';
 
+console.log(window.location.origin)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -17,7 +18,7 @@ createRoot(document.getElementById('root')!).render(
       domain="dev-3gneykmd0foohzrw.us.auth0.com"
       clientId="u4A9bTGpGhGNhmWMFgtutwiPyKovMjwS"
       authorizationParams={{
-        redirect_uri: window.location.origin
+        redirect_uri: window.location.origin + '/CodingCoach/'
       }}
     >
       <BrowserRouter>
