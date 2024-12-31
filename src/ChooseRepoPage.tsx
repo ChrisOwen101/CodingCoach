@@ -87,7 +87,7 @@ const ChooseRepo = () => {
   }, [chosenRepo]);
 
   useEffect(() => {
-    if (!chosenFile) {
+    if (!chosenFile || !chosenRepo || !user) {
       return;
     }
 
