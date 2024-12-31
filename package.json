@@ -23,7 +23,8 @@
     "react-router": "^7.1.1",
     "react-router-dom": "^7.1.1",
     "react-syntax-highlighter": "^15.6.1",
-    "rehype-rewrite": "^4.0.2"
+    "rehype-rewrite": "^4.0.2",
+    "vite-plugin-gh-pages": "^1.0.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
