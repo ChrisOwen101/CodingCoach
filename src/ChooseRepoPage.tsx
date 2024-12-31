@@ -1,15 +1,15 @@
 import './App.css'
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from "./hooks/useAuth";
 import { getGithubToken } from './networks/auth0';
 import { getRepoContent, getRepoFile, getUserRepos, searchRepos, RepoContent, Repo } from './networks/github';
 import { useNavigate } from 'react-router-dom';
 import { getStoredRepoFiles, getStoredRepoList, setStoredRepoFiles, setStoredRepoList } from './hooks/localStorage';
 import NavBar from './NavBar';
+import { useAuth0 } from "@auth0/auth0-react";
+
 
 const ChooseRepo = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth();
 
   const [repos, setRepos] = useState<Repo[]>([]);
   const [contents, setContents] = useState<RepoContent | undefined>(undefined);
@@ -22,6 +22,8 @@ const ChooseRepo = () => {
   const [reposLoading, setReposLoading] = useState<boolean>(true);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [contentsLoading, setContentsLoading] = useState<boolean>(false);
+  const { user, isAuthenticated } = useAuth0();
+
 
   const loadRepos = async () => {
     console.log("1")
@@ -61,7 +63,7 @@ const ChooseRepo = () => {
   }, [user, isAuthenticated]);
 
   useEffect(() => {
-    if (!chosenRepo) {
+    if (!chosenRepo || !user) {
       return;
     }
 

@@ -38,6 +38,6 @@ export const setStoredRepoList = (username: string | undefined, value: any) => {
     setValue(`repo_list_user_${username}`, value)
 }
 
-export const getStoredRepoList = (username: string) => {
+export const getStoredRepoList = (username: string | undefined) => {
     return getValue(`repo_list_user_${username}`, [])
 }
