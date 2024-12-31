@@ -9,6 +9,8 @@ export const getGithubToken = async (user_id: string) => {
 
     const data = await response.json();
 
+    console.log(data)
+
     for (const identity of data.identities) {
         if (identity.provider === 'github') {
             return identity.access_token;
