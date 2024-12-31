@@ -1,7 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import './index.css'
 import App from './App.tsx'
 import './scss/styles.scss'
 import LoginPage from './LoginPage';
@@ -9,8 +8,8 @@ import { AuthProvider } from './hooks/useAuth';
 import { ProtectedRoute } from './routes/ProtectedRoute';
 import { Auth0Provider } from '@auth0/auth0-react';
 import ChooseRepo from './ChooseRepoPage.tsx';
+import './index.css'
 
-console.log(window.location.origin)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

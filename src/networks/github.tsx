@@ -26,24 +26,24 @@ export interface Repo {
 }
 
 export const getUserRepos = async (accessToken: string) => {
-  try {
-    const response = await axios.get('https://api.github.com/user/repos', {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Accept': 'application/vnd.github.v3+json',
-      },
-      params: {
-        visibility: 'all', // Retrieve both public and private repositories
-        sort: 'pushed', // Sort repositories by the date they were last updated
-        affiliation: 'owner, collaborator', // Retrieve repositories that the authenticated user owns
-      },
-    });
+    try {
+        const response = await axios.get('https://api.github.com/user/repos', {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Accept': 'application/vnd.github.v3+json',
+            },
+            params: {
+                visibility: 'all', // Retrieve both public and private repositories
+                sort: 'pushed', // Sort repositories by the date they were last updated
+                affiliation: 'owner, collaborator', // Retrieve repositories that the authenticated user owns
+            },
+        });
 
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching user repositories:', error);
-    throw error;
-  }
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user repositories:', error);
+        throw error;
+    }
 };
 
 export const getRepoContent = async (accessToken: string, repo_full_name: string, path: string = ''): Promise<RepoContent> => {

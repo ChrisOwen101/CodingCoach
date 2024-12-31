@@ -1,2 +1,17 @@
-// Import all of Bootstrap's CSS
+$primary: #344e41;
+$secondary: #3a5a40;
+$success: #28a745;
+$info: #a3b18a;
+$warning: #ffb703;
+$danger: #fb8500;
+$light: #f8f9fa;
+$dark: #343a40;
+
+$critical: #324d37;
+$high: #53815c;
+$medium: #7eac86;
+$low: #b2cdb7;
+$informational: #e5eee7;
+
+// Import Bootstrap and custom styles
 @import "bootstrap/scss/bootstrap";

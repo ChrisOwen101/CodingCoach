@@ -1,5 +1,5 @@
 
-export const getValue = (keyName:string|"", defaultValue: any) => {
+export const getValue = (keyName: string | "", defaultValue: any) => {
     try {
         const value = window.localStorage.getItem(keyName);
         if (value) {
@@ -13,7 +13,7 @@ export const getValue = (keyName:string|"", defaultValue: any) => {
     }
 }
 
-export const setValue = (keyName:string, newValue: string| undefined) => {
+export const setValue = (keyName: string, newValue: string | undefined) => {
     try {
         window.localStorage.setItem(keyName, JSON.stringify(newValue));
     } catch (err) {
@@ -21,7 +21,7 @@ export const setValue = (keyName:string, newValue: string| undefined) => {
     }
 };
 
-export const setUser = (value:string | undefined) => {
+export const setUser = (value: string | undefined) => {
     setValue("userLocal", value)
 }
 

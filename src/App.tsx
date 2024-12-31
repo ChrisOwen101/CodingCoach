@@ -8,6 +8,7 @@ import rehypePrism from 'rehype-prism-plus';
 import rehypeRewrite from "rehype-rewrite";
 import FeedbackModal from './FeedbackModal';
 import { useLocation } from 'react-router';
+import NavBar from './NavBar';
 
 const App = () => {
   const { state } = useLocation();
@@ -83,11 +84,11 @@ const App = () => {
   const getFeedbackSidePanel = () => {
     const getSeverityColor = (severity: number) => {
       switch (severity) {
-        case 5: return '#f8d7da';  // critical
-        case 4: return '#fff3cd';  // high
-        case 3: return '#d1ecf1';  // medium
-        case 2: return '#e2e3e5';  // low
-        default: return '#fefefe'; // informational
+        case 5: return '#74a57d';  // critical
+        case 4: return '#93b99a';  // high
+        case 3: return '#b2cdb7';  // medium
+        case 2: return '#d1e1d4';  // low
+        default: return '#f0f5f1'; // informational
       }
     };
 
@@ -210,58 +211,60 @@ const App = () => {
   const showIntroPanel = feedbackList.length === 0;
 
   return (
-    <div style={{ display: 'flex', height: '100vh', margin: expandedPointModalOpen ? "0px" : '12px', position: 'relative' }}>
-      {expandedPointModalOpen && <div style={{ position: 'fixed', top: 0, right: 0, width: '50%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.5)', zIndex: 1 }}></div>}
-      <div ref={codeEditorRef} style={{ position: 'relative', flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
-        <CodeEditor
-          value={code}
-          language={feedbackList.length > 0 ? language : "text"}
-          placeholder="Copy and paste your code here"
-          onChange={(evn) => {
-            const newCode = evn.target.value;
-            if (newCode !== code) {
-              setHasCodeChanged(true);
-              setCode(newCode);
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', margin: 0, overflow: 'hidden' }}>
+      <NavBar />
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <div ref={codeEditorRef} style={{ position: 'relative', flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: expandedPointModalOpen ? '0px' : '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
+          <CodeEditor
+            value={code}
+            language={feedbackList.length > 0 ? language : "text"}
+            placeholder="Copy and paste your code here"
+            onChange={(evn) => {
+              const newCode = evn.target.value;
+              if (newCode !== code) {
+                setHasCodeChanged(true);
+                setCode(newCode);
+              }
             }
-          }
-          }
-          padding={15}
-          rehypePlugins={[
-            [rehypePrism, { ignoreMissing: true }],
-            [
-              rehypeRewrite,
-              {
-                rewrite: (node: any, index: number) => {
-                  if (node.properties?.className?.includes("code-line")) {
-                    const point = hoveredPoint || expandedPoint;
+            }
+            padding={15}
+            rehypePlugins={[
+              [rehypePrism, { ignoreMissing: true }],
+              [
+                rehypeRewrite,
+                {
+                  rewrite: (node: any, index: number) => {
+                    if (node.properties?.className?.includes("code-line")) {
+                      const point = hoveredPoint || expandedPoint;
 
-                    if (point && point.line_numbers) {
-                      const linesToHighlight = getLinesToHighlight(point.line_numbers);
+                      if (point && point.line_numbers) {
+                        const linesToHighlight = getLinesToHighlight(point.line_numbers);
 
-                      if (linesToHighlight.includes(index + 1)) {
-                        node.properties.className.push("code_highlighted");
-                      } else {
-                        node.properties.className.push("code_greyed");
+                        if (linesToHighlight.includes(index + 1)) {
+                          node.properties.className.push("code_highlighted");
+                        } else {
+                          node.properties.className.push("code_greyed");
+                        }
+
                       }
-
                     }
                   }
                 }
-              }
-            ]
-          ]}
-          style={{
-            backgroundColor: "#f5f5f5",
-            minHeight: '100%',
-            fontSize: 14,
-            fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
-          }}
-        />
+              ]
+            ]}
+            style={{
+              backgroundColor: "#f5f5f5",
+              minHeight: '100%',
+              fontSize: 14,
+              fontFamily: 'ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace',
+            }}
+          />
+        </div>
+        <div style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
+          {isLoading ? getLoadingPanel() : showIntroPanel ? getIntroPanel() : getFeedbackSidePanel()}
+        </div>
       </div>
-      <div style={{ flex: expandedPointModalOpen ? '0 0 50%' : 1, padding: '12px', overflowY: 'auto', zIndex: expandedPointModalOpen ? 2 : 0 }}>
-        {isLoading ? getLoadingPanel() : showIntroPanel ? getIntroPanel() : getFeedbackSidePanel()}
-      </div>
-    </div >
+    </div>
   );
 }
 export default App

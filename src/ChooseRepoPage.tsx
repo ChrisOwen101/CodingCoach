@@ -5,16 +5,20 @@ import { getGithubToken } from './networks/auth0';
 import { getRepoContent, getRepoFile, getUserRepos, RepoContent, Repo } from './networks/github';
 import { useNavigate } from 'react-router-dom';
 import { getStoredRepoFiles, getStoredRepoList, setStoredRepoFiles, setStoredRepoList } from './hooks/localStorage';
+import NavBar from './NavBar';
 
 const ChooseRepo = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();  
-  
+  const { user } = useAuth();
+
   const [repos, setRepos] = useState<Repo[]>([]);
   const [contents, setContents] = useState<RepoContent | undefined>(undefined);
-  
+
   const [chosenRepo, setChosenRepo] = useState<string>('');
   const [chosenFile, setChosenFile] = useState<string | undefined>('');
+
+  const [reposLoading, setReposLoading] = useState<boolean>(false);
+  const [contentsLoading, setContentsLoading] = useState<boolean>(false);
 
 
   useEffect(() => {
@@ -22,8 +26,10 @@ const ChooseRepo = () => {
       return;
     }
 
+    setReposLoading(true);
+
     const storedRepoList = getStoredRepoList(user.sub)
-    if(storedRepoList){
+    if (storedRepoList) {
       setRepos(repos);
     }
 
@@ -32,6 +38,7 @@ const ChooseRepo = () => {
       const repos = await getUserRepos(token);
       setRepos(repos);
       setStoredRepoList(user.sub, repos)
+      setReposLoading(false);
     };
 
     loadRepos();
@@ -42,8 +49,10 @@ const ChooseRepo = () => {
       return;
     }
 
+    setContentsLoading(true);
+
     const storedFiles = getStoredRepoFiles(chosenRepo)
-    if (storedFiles){
+    if (storedFiles) {
       setContents(storedFiles);
     }
 
@@ -52,10 +61,11 @@ const ChooseRepo = () => {
       const files = await getRepoContent(token, chosenRepo);
       setContents(files);
       setStoredRepoFiles(chosenRepo, files)
+      setContentsLoading(false);
     };
 
     loadContents();
-  } , [chosenRepo]);
+  }, [chosenRepo]);
 
   useEffect(() => {
     if (!chosenFile) {
@@ -74,12 +84,12 @@ const ChooseRepo = () => {
     }
 
     loadFile();
-  } , [chosenFile]);
+  }, [chosenFile]);
 
   const renderRepoContent = (content: RepoContent) => {
     if (content.type === 'file') {
-      return <li key={content.path}><button onClick={() => setChosenFile(content.path) }
-        >{content.name}</button></li >;
+      return <li key={content.path}><button type="button" style={{ margin: '4px' }} className="btn btn-primary" onClick={() => setChosenFile(content.path)}
+      >{content.name}</button></li >;
     }
 
     return (
@@ -92,20 +102,30 @@ const ChooseRepo = () => {
     );
   };
 
+  const getRepoList = () => {
+    return <ul>
+      {repos.map(repo => (
+        <button type="button" style={{ margin: '4px' }} className="btn btn-primary" key={repo.id} onClick={() => setChosenRepo(repo.full_name)}
+        >{repo.name}</button>
+      ))}
+    </ul>
+  }
+
+  const getContents = () => {
+    return <ul>
+      {contents && contents.children && contents.children.map((content: any) => renderRepoContent(content))}
+    </ul>
+  }
+
   return (
     <div>
-      <h1>Choose a repository</h1>
-      <ul>
-        {repos.map(repo => (
-          <button key={repo.id} onClick={() => setChosenRepo(repo.full_name) }
-            >{repo.name}</button>
-        ))}
-      </ul>
-
-      <h1>Choose a file</h1>
-      <ul>
-        {contents && contents.children && contents.children.map((content: any) => renderRepoContent(content))}
-      </ul>
+      <NavBar />
+      <div className="container">
+        <h1>Choose a repository</h1>
+        {reposLoading ? <div className='spinner' /> : getRepoList()}
+        <h1>Choose a file</h1>
+        {contentsLoading ? <div className='spinner' /> : getContents()}
+      </div>
     </div>
   );
 };
