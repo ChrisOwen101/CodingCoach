@@ -22,7 +22,14 @@ const ChooseRepo = () => {
   const [reposLoading, setReposLoading] = useState<boolean>(true);
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [contentsLoading, setContentsLoading] = useState<boolean>(false);
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isLoading, error, isAuthenticated } = useAuth0();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>Oops... {error.message}</div>;
+  }
 
 
   const loadRepos = async () => {
