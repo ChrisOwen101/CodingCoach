@@ -23,7 +23,7 @@ const ChooseRepo = () => {
   const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [contentsLoading, setContentsLoading] = useState<boolean>(false);
 
-  useEffect(() => {
+  const loadRepos = async () => {
     console.log("1")
     if (!user) {
       return;
@@ -54,7 +54,11 @@ const ChooseRepo = () => {
 
     loadRepos();
     console.log("end")
-  }, [user]);
+  }
+
+  useEffect(() => {
+    loadRepos();
+  }, [user, loadRepos, isAuthenticated]);
 
   useEffect(() => {
     if (!chosenRepo) {
