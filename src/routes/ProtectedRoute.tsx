@@ -10,7 +10,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
     const { getUser } = useAuth();
     if (!getUser()) {
-        return <Navigate to="/CodingCoach/login" />;
+        return <Navigate to="/login" />;
     }
 
     return <>{children}</>;
