@@ -54,7 +54,7 @@ const ChooseRepo = () => {
 
     loadRepos();
     console.log("end")
-  }, [isAuthenticated]);
+  }, [user]);
 
   useEffect(() => {
     if (!chosenRepo) {
