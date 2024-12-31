@@ -77,7 +77,7 @@ export const getRepoContent = async (accessToken: string, repo_full_name: string
         result.children = result.children!.filter((file: any) => {
             if (file.type === 'file') {
                 const ext = file.name.split('.').pop();
-                return ['js', 'ts', 'jsx', 'tsx', 'py', 'java', 'rb', 'c', 'cpp', 'h', 'html', 'css', 'scss', 'sass', 'less'].includes(ext);
+                return isValidFile(ext);
             }
             return true;
         });
@@ -127,4 +127,39 @@ export const searchRepos = async (accessToken: string, query: string, username: 
         throw error;
     }
 };
+
+const isValidFile = (extension: string) => {
+    return [
+        "abap", "asc", "ash", "ampl", "mod", "g4", "apib", "apl", "dyalog",
+        "asp", "asax", "ascx", "ashx", "asmx", "aspx", "axd", "dats", "hats",
+        "sats", "as", "adb", "ada", "ads", "agda", "als", "apacheconf", "vhost",
+        "cls", "applescript", "scpt", "arc", "ino", "asciidoc", "adoc", "asc",
+        "aj", "asm", "a51", "inc", "nasm", "aug", "ahk", "ahkl", "au3", "awk",
+        "auk", "gawk", "mawk", "nawk", "bat", "cmd", "befunge", "bison", "bb",
+        "bb.decls", "bmx", "bsv", "boo", "b", "bf", "brs", "bro", "c", "cats",
+        "h", "idc", "w", "cs", "cake", "cshtml", "csx", "cpp", "c++", "cc",
+        "cp", "cxx", "h", "h++", "hh", "hpp", "hxx", "inc", "inl", "ipp",
+        "tcc", "tpp", "c-objdump", "chs", "clp", "cmake", "cmake.in", "cob",
+        "cbl", "ccp", "cobol", "cpy", "css", "csv", "capnp", "mss", "ceylon",
+        "chpl", "ch", "ck", "cirru", "clw", "icl", "dcl", "click", "clj",
+        "boot", "cl2", "cljc", "cljs", "cljs.hl", "cljscm", "cljx", "hic",
+        "coffee", "_coffee", "cake", "cjsx", "cson", "iced", "cfm", "cfml",
+        "cfc", "lisp", "asd", "cl", "l", "lsp", "ny", "podsl", "sexp", "cp",
+        "cps", "cl", "coq", "v", "cppobjdump", "c++-objdump", "c++objdump",
+        "cpp-objdump", "cxx-objdump", "creole", "cr", "feature", "cu", "cuh",
+        "cy", "pyx", "pxd", "pxi", "d", "di", "d-objdump", "com", "dm",
+        "zone", "arpa", "darcspatch", "dpatch", "dart", "diff", "patch",
+        "dockerfile", "djs", "dylan", "dyl", "intr", "lid", "E", "ecl",
+        "eclxml", "sch", "brd", "epj", "e", "ex", "exs", "elm", "el",
+        "emacs", "emacs.desktop", "em", "emberscript", "erl", "es", "escript",
+        "hrl", "xrl", "yrl", "fs", "fsi", "fsx", "fx", "flux", "f90", "f",
+        "f03", "f08", "f77", "f95", "for", "fpp", "factor", "fy", "fancypack",
+        "fan", "fs", "eam.fs", "fth", "4th", "for", "forth", "fr", "frt",
+        "ftl", "freemarker", "fasm", "gb", "gdscript", "gap", "gapp",
+        "glslang", "hlsl", "html", "ico", "imgbot", "isl", "jsx", "stylus",
+        "xml", "yml", "lua", "mk", "mak", "make", "mk", "mkfile",
+        "m", "m4", "ml", "eliom", "eliomi", "ml4", "mli", "mll", "mly"
+    ].includes(extension);
+
+}
 

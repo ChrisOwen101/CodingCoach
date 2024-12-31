@@ -9,7 +9,7 @@ import NavBar from './NavBar';
 
 const ChooseRepo = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const [repos, setRepos] = useState<Repo[]>([]);
   const [contents, setContents] = useState<RepoContent | undefined>(undefined);
@@ -19,7 +19,8 @@ const ChooseRepo = () => {
   const [chosenRepo, setChosenRepo] = useState<string>('');
   const [chosenFile, setChosenFile] = useState<string | undefined>('');
 
-  const [reposLoading, setReposLoading] = useState<boolean>(false);
+  const [reposLoading, setReposLoading] = useState<boolean>(true);
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
   const [contentsLoading, setContentsLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -32,6 +33,7 @@ const ChooseRepo = () => {
     const storedRepoList = getStoredRepoList(user.sub)
     if (storedRepoList) {
       setRepos(repos);
+      setReposLoading(false);
     }
 
     const loadRepos = async () => {
@@ -43,7 +45,7 @@ const ChooseRepo = () => {
     };
 
     loadRepos();
-  }, [user]);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (!chosenRepo) {
@@ -55,6 +57,7 @@ const ChooseRepo = () => {
     const storedFiles = getStoredRepoFiles(chosenRepo)
     if (storedFiles) {
       setContents(storedFiles);
+      setContentsLoading(false);
     }
 
     const loadContents = async () => {
@@ -88,12 +91,14 @@ const ChooseRepo = () => {
 
   const handleSearch = useCallback(async () => {
     if (!searchQuery) return;
-    setReposLoading(true);
+
+    setSearchResults([]);
+    setSearchLoading(true);
     const token = await getGithubToken(user?.sub ?? '');
     const username = user?.nickname ?? '';
     const results = await searchRepos(token, searchQuery, username);
     setSearchResults(results);
-    setReposLoading(false);
+    setSearchLoading(false);
   }, [searchQuery, user]);
 
   const renderRepoContent = (content: RepoContent) => {
@@ -145,11 +150,17 @@ const ChooseRepo = () => {
             placeholder="Repository name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+              }
+            }}
           />
           <button className="btn btn-outline-secondary" type="button" onClick={handleSearch}>
             Search
           </button>
         </div>
+        {searchLoading ? <div className="spinner" /> : <></>}
         {searchResults.length === 0
           ? <></>
           : searchResults.map((repo) => (
