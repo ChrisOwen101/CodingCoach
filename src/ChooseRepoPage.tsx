@@ -31,6 +31,8 @@ const ChooseRepo = () => {
     return <div>Oops... {error.message}</div>;
   }
 
+  console.log(user)
+
 
   const loadRepos = async () => {
     console.log("1")
