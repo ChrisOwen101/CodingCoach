@@ -31,40 +31,28 @@ const ChooseRepo = () => {
     return <div>Oops... {error.message}</div>;
   }
 
-  console.log(user)
-
-
   const loadRepos = async () => {
-    console.log("1")
     if (!user) {
       return;
     }
-
-    console.log("2")
 
     setReposLoading(true);
 
     const storedRepoList = getStoredRepoList(user.sub)
     if (storedRepoList) {
-      console.log("3")
       setRepos(repos);
       setReposLoading(false);
     }
 
-    console.log("4")
-
     const loadRepos = async () => {
       const token = await getGithubToken(user.sub);
-      console.log("5")
       const repos = await getUserRepos(token);
-      console.log("6")
       setRepos(repos);
       setStoredRepoList(user.sub, repos)
       setReposLoading(false);
     };
 
     loadRepos();
-    console.log("end")
   }
 
   useEffect(() => {

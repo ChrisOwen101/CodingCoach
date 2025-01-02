@@ -130,35 +130,7 @@ export const searchRepos = async (accessToken: string, query: string, username: 
 
 const isValidFile = (extension: string) => {
     return [
-        "abap", "asc", "ash", "ampl", "mod", "g4", "apib", "apl", "dyalog",
-        "asp", "asax", "ascx", "ashx", "asmx", "aspx", "axd", "dats", "hats",
-        "sats", "as", "adb", "ada", "ads", "agda", "als", "apacheconf", "vhost",
-        "cls", "applescript", "scpt", "arc", "ino", "asciidoc", "adoc", "asc",
-        "aj", "asm", "a51", "inc", "nasm", "aug", "ahk", "ahkl", "au3", "awk",
-        "auk", "gawk", "mawk", "nawk", "bat", "cmd", "befunge", "bison", "bb",
-        "bb.decls", "bmx", "bsv", "boo", "b", "bf", "brs", "bro", "c", "cats",
-        "h", "idc", "w", "cs", "cake", "cshtml", "csx", "cpp", "c++", "cc",
-        "cp", "cxx", "h", "h++", "hh", "hpp", "hxx", "inc", "inl", "ipp",
-        "tcc", "tpp", "c-objdump", "chs", "clp", "cmake", "cmake.in", "cob",
-        "cbl", "ccp", "cobol", "cpy", "css", "csv", "capnp", "mss", "ceylon",
-        "chpl", "ch", "ck", "cirru", "clw", "icl", "dcl", "click", "clj",
-        "boot", "cl2", "cljc", "cljs", "cljs.hl", "cljscm", "cljx", "hic",
-        "coffee", "_coffee", "cake", "cjsx", "cson", "iced", "cfm", "cfml",
-        "cfc", "lisp", "asd", "cl", "l", "lsp", "ny", "podsl", "sexp", "cp",
-        "cps", "cl", "coq", "v", "cppobjdump", "c++-objdump", "c++objdump",
-        "cpp-objdump", "cxx-objdump", "creole", "cr", "feature", "cu", "cuh",
-        "cy", "pyx", "pxd", "pxi", "d", "di", "d-objdump", "com", "dm",
-        "zone", "arpa", "darcspatch", "dpatch", "dart", "diff", "patch",
-        "dockerfile", "djs", "dylan", "dyl", "intr", "lid", "E", "ecl",
-        "eclxml", "sch", "brd", "epj", "e", "ex", "exs", "elm", "el",
-        "emacs", "emacs.desktop", "em", "emberscript", "erl", "es", "escript",
-        "hrl", "xrl", "yrl", "fs", "fsi", "fsx", "fx", "flux", "f90", "f",
-        "f03", "f08", "f77", "f95", "for", "fpp", "factor", "fy", "fancypack",
-        "fan", "fs", "eam.fs", "fth", "4th", "for", "forth", "fr", "frt",
-        "ftl", "freemarker", "fasm", "gb", "gdscript", "gap", "gapp",
-        "glslang", "hlsl", "html", "ico", "imgbot", "isl", "jsx", "stylus",
-        "xml", "yml", "lua", "mk", "mak", "make", "mk", "mkfile",
-        "m", "m4", "ml", "eliom", "eliomi", "ml4", "mli", "mll", "mly"
+        "4th", "a51", "adb", "ada", "adml", "admx", "adoc", "ads", "agda", "ahk", "ahkl", "aj", "als", "ampl", "ant", "apib", "apl", "applescript", "arc", "arpa", "as", "asax", "asc", "asciidoc", "ascx", "ash", "ashx", "asm", "asmx", "asp", "aspx", "asr", "awk", "axd", "b", "bat", "bb", "bb.decls", "befunge", "bison", "bmx", "boo", "brd", "bro", "builder", "c", "c++", "cake", "capnp", "cc", "ccproj", "ccxml", "cfc", "cfm", "cfml", "ch", "chpl", "chs", "cirru", "cl", "cl2", "clj", "cljc", "cljs", "cljs.hl", "cljx", "clp", "cls", "clw", "cmake", "cmake.in", "cob", "cobol", "coffee", "com", "cpp", "cpp-objdump", "cppobjdump", "cql", "creole", "cs", "csdef", "csh", "cson", "csproj", "csx", "ctp", "cu", "cuh", "cxx", "cxx-objdump", "d", "d-objdump", "dart", "dats", "db", "ddl", "depproj", "diff", "dita", "ditamap", "ditaval", "dockerfile", "dotsettings", "dpatch", "dtx", "dylan", "e", "ebuild", "ecl", "eclxml", "edn", "eex", "el", "eliom", "eliomi", "elm", "emacs", "emberscript", "erl", "es", "escript", "ex", "exs", "f", "f03", "f08", "f77", "f90", "f95", "factor", "fan", "fancypack", "fasm", "fcgi", "feature", "filters", "flux", "for", "forth", "fpp", "fr", "freemarker", "frt", "fs", "fsi", "fsproj", "fsx", "fth", "ftl", "g4", "gap", "gemspec", "glade", "gml", "gmx", "god", "gradle", "groovy", "grxml", "gsp", "gyp", "h", "h++", "haml", "handlebars", "hats", "haxe", "hbs", "hh", "hpp", "hrl", "hs", "html", "hx", "hxx", "iced", "icl", "idc", "iml", "inc", "inl", "ino", "ins", "intr", "io", "ipynb", "ivy", "j", "jade", "java", "jbuilder", "jl", "js", "jsproj", "json", "json5", "jsonc", "jsonld", "jsonnet", "jsx", "kml", "kt", "ktm", "kts", "l", "lbx", "ld", "less", "lex", "lfe", "lisp", "litcoffee", "lmi", "lock", "log", "lol", "lsl", "lua", "m", "m4", "mak", "make", "makefile", "mako", "man", "markdown", "mask", "matlab", "md", "mdpolicy", "meson", "mib", "mjml", "mk", "mkd", "mkdown", "mkfile", "mkii", "mkiv", "mkvi", "ml", "ml4", "mli", "mll", "mly", "mm", "mxml", "nasm", "nawk", "nginx", "nim", "nims", "nimble", "nix", "nl", "nproj", "ns", "nsh", "nsi", "nu", "nuspec", "ny", "objdump", "odd", "osm", "p6", "p6l", "p6m", "pas", "patch", "pb", "pbi", "pde", "perl", "php", "php3", "php4", "php5", "phps", "phpt", "phtml", "pir", "pl", "pl6", "plx", "pm", "pm6", "pod", "podsl", "pot", "pov", "pp", "prc", "properties", "proto", "ps1", "ps1xml", "psc1", "psd1", "psm1", "pt", "pug", "py", "py3", "pyde", "pyi", "pyp", "pyt", "pyw", "qml", "r", "rabl", "rake", "rb", "rbw", "rbx", "rd", "rdf", "rdoc", "resx", "rexx", "rhtml", "rkt", "rktd", "rktl", "rlib", "ronn", "rs", "rss", "rst", "rtf", "ru", "ruby", "s", "sas", "sass", "scala", "scaml", "scm", "scss", "sh", "shproj", "slim", "sls", "smali", "sml", "smt2", "sol", "soy", "sparql", "sql", "sqlite", "srt", "ss", "stan", "stex", "storyboard", "styl", "stylus", "sv", "svg", "svh", "swift", "t", "tac", "targets", "tcl", "tcsh", "tex", "textile", "tf", "thor", "thrift", "tm", "tml", "toml", "ts", "tsx", "tt", "tt2", "ttcn", "ttcn3", "twig", "txl", "txt", "uc", "urdf", "v", "vala", "vapi", "vb", "vba", "vbhtml", "vbproj", "vbs", "vcxproj", "vhdl", "vim", "vue", "wixproj", "wsdl", "wsf", "wsgi", "x3d", "xacro", "xaml", "xib", "xliff", "xml", "xml.dist", "xproj", "xsd", "xspec", "xul", "yaml", "yml", "zsh"
     ].includes(extension);
 
 }
